@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react'
+import { HISTORY_MONTHS } from '../../data/adminSeed'
 import { lastMonths, monthKey, monthLabel } from '../../lib/analytics'
 
 interface Props {
@@ -7,9 +8,9 @@ interface Props {
   onChange: (d: Date) => void
 }
 
-/** Seletor dos últimos 6 meses. */
+/** Seletor dos meses com histórico. */
 export default function MonthSelect({ now, value, onChange }: Props) {
-  const months = lastMonths(now, 6).reverse()
+  const months = lastMonths(now, HISTORY_MONTHS).reverse()
   return (
     <label className="relative inline-flex items-center">
       <span className="sr-only">Mês de referência</span>

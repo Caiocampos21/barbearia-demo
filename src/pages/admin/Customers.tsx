@@ -7,6 +7,7 @@ import ChartTooltip from '../../components/admin/ChartTooltip'
 import { axisProps, chartColors } from '../../components/admin/chartTheme'
 import KpiCard from '../../components/admin/KpiCard'
 import PageHeader from '../../components/admin/PageHeader'
+import { HISTORY_MONTHS } from '../../data/adminSeed'
 import { barbers, services } from '../../data/seed'
 import { useAdminData } from '../../hooks/useAdminData'
 import { birthdaysOfMonth, customerMonthSplit, customerStats, inMonth, isRealized, lastMonths, monthKey, monthLabel, shortMonth, type CustomerStat } from '../../lib/analytics'
@@ -48,7 +49,7 @@ export default function Customers() {
   const split = customerMonthSplit(ds, stats, ds.now)
   const monthRevenue = ds.visits.filter((v) => inMonth(v.date, ds.now) && isRealized(v)).reduce((a, v) => a + v.price, 0)
   const returnRate = split.active ? split.recorrentes / split.active : 0
-  const history = lastMonths(ds.now, 6).map((m) => {
+  const history = lastMonths(ds.now, HISTORY_MONTHS).map((m) => {
     const s = customerMonthSplit(ds, stats, m)
     return { key: monthKey(m), label: shortMonth(m), novos: s.novos, recorrentes: s.recorrentes }
   })

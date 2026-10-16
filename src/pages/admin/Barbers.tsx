@@ -9,6 +9,7 @@ import { axisProps, chartColors } from '../../components/admin/chartTheme'
 import MonthSelect from '../../components/admin/MonthSelect'
 import PageHeader from '../../components/admin/PageHeader'
 import Reveal from '../../components/ui/Reveal'
+import { HISTORY_MONTHS } from '../../data/adminSeed'
 import { barbers } from '../../data/seed'
 import { useAdminData } from '../../hooks/useAdminData'
 import { barberMonthly, barberStats, monthLabel } from '../../lib/analytics'
@@ -28,7 +29,7 @@ export default function Barbers() {
   const ds = useAdminData()
   const [month, setMonth] = useState(() => startOfMonth(new Date()))
   const stats = barberStats(ds, month)
-  const evolution = barberMonthly(ds, 7).slice(0, 6) // só meses fechados
+  const evolution = barberMonthly(ds, HISTORY_MONTHS).slice(0, -1) // só meses fechados
   const comparison = stats.map((s) => ({ name: s.name.split(' ')[0], faturamento: Math.round(s.revenue), comissao: Math.round(s.commission) }))
 
   return (
@@ -98,7 +99,7 @@ export default function Barbers() {
           </div>
         </Card>
 
-        <Card title="Evolução mensal" subtitle="Faturamento de cada barbeiro nos últimos 6 meses fechados">
+        <Card title="Evolução mensal" subtitle={`Faturamento de cada barbeiro nos últimos ${HISTORY_MONTHS - 1} meses fechados`}>
           <ul className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-ink-300">
             {barbers.map((b) => (
               <li key={b.id} className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { eachDayOfInterval, endOfMonth, format, startOfMonth, subMonths } from 'date-fns'
+import { eachDayOfInterval, endOfMonth, format, getDaysInMonth, isSameMonth, startOfMonth, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { commissionRates, customers as seedCustomers, getExpenses, getMockVisits, getPurchases, products } from '../data/adminSeed'
 import { barbers, services, weekHours } from '../data/seed'
@@ -166,11 +166,14 @@ export function commissionOf(visits: Visit[]) {
   return sum(visits.filter(isRealized), (v) => v.price * (commissionRates[v.barberId] ?? 0.4))
 }
 
+/** Despesas fixas do mês em andamento entram proporcionais aos dias decorridos (regime de competência). */
+const fixedShare = (ds: Dataset, month: Date) => (isSameMonth(month, ds.now) ? ds.now.getDate() / getDaysInMonth(ds.now) : 1)
+
 export function monthlyFinance(ds: Dataset, n = 6) {
   return lastMonths(ds.now, n).map((m) => {
     const visits = ds.visits.filter((v) => inMonth(v.date, m))
     const receita = sum(visits.filter(isRealized), (v) => v.price)
-    const fixas = sum(ds.expenses.filter((e) => inMonth(e.date, m)), (e) => e.amount)
+    const fixas = sum(ds.expenses.filter((e) => inMonth(e.date, m)), (e) => e.amount) * fixedShare(ds, m)
     const produtos = sum(ds.purchases.filter((p) => inMonth(p.date, m)), (p) => p.total)
     const comissoes = commissionOf(visits)
     const despesas = fixas + produtos + comissoes
@@ -201,7 +204,7 @@ export function topServices(ds: Dataset, month: Date) {
 // ───────────── Financeiro ─────────────
 export function expensesByCategory(ds: Dataset, month: Date) {
   const map = new Map<string, number>()
-  for (const e of ds.expenses.filter((e) => inMonth(e.date, month))) map.set(e.category, (map.get(e.category) ?? 0) + e.amount)
+  for (const e of ds.expenses.filter((e) => inMonth(e.date, month))) map.set(e.category, (map.get(e.category) ?? 0) + e.amount * fixedShare(ds, month))
   map.set('Produtos e estoque', sum(ds.purchases.filter((p) => inMonth(p.date, month)), (p) => p.total))
   map.set('Comissões da equipe', commissionOf(ds.visits.filter((v) => inMonth(v.date, month))))
   return [...map.entries()]

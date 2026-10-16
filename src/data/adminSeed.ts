@@ -6,25 +6,27 @@ import type { Customer, Expense, Product, Purchase, Visit } from '../lib/types'
 import { barbers, services } from './seed'
 
 /** Comissão paga a cada barbeiro sobre o faturamento gerado. */
-export const commissionRates: Record<string, number> = { rafael: 0.5, thiago: 0.45, bruno: 0.4, leo: 0.4 }
+export const commissionRates: Record<string, number> = { rafael: 0.45, thiago: 0.4, bruno: 0.35, leo: 0.35 }
 
-const HISTORY_DAYS = 420 // > 1 ano de histórico: assim "novo × recorrente" não é distorcido pelo início dos dados
+/** Meses exibidos nos gráficos (mês atual + anteriores). O histórico gerado cobre um pouco mais que isso. */
+export const HISTORY_MONTHS = 4
+const HISTORY_DAYS = 125
 const FUTURE_DAYS = 30
 
 // Peso de cada serviço no mix de vendas (soma = 1).
 const serviceWeights: [string, number][] = [
-  ['corte', 0.33],
-  ['combo', 0.2],
+  ['corte', 0.3],
+  ['combo', 0.26],
   ['barba', 0.17],
-  ['hidratacao', 0.11],
-  ['pezinho', 0.1],
-  ['sobrancelha', 0.09],
+  ['hidratacao', 0.1],
+  ['pezinho', 0.09],
+  ['sobrancelha', 0.08],
 ]
 
 const firstNames = ['Lucas', 'Gabriel', 'Mateus', 'Pedro', 'João', 'Rafael', 'Bruno', 'Felipe', 'Gustavo', 'Henrique', 'Rodrigo', 'Thiago', 'André', 'Leonardo', 'Daniel', 'Vinícius', 'Eduardo', 'Marcelo', 'Fernando', 'Ricardo', 'Diego', 'Samuel', 'Caio', 'Arthur', 'Davi', 'Renato', 'Alexandre', 'Matheus', 'Otávio', 'Luiz', 'Igor', 'Murilo', 'Victor', 'Paulo', 'Sérgio']
 const lastNames = ['Silva', 'Souza', 'Oliveira', 'Santos', 'Pereira', 'Costa', 'Rodrigues', 'Almeida', 'Nascimento', 'Lima', 'Araújo', 'Fernandes', 'Carvalho', 'Gomes', 'Martins', 'Rocha', 'Ribeiro', 'Alves', 'Monteiro', 'Mendes', 'Barros', 'Freitas', 'Barbosa', 'Pinto', 'Moreira', 'Cavalcanti', 'Dias', 'Castro', 'Campos', 'Cardoso', 'Teixeira', 'Machado']
 
-const CUSTOMER_COUNT = 900 // ~1.200 atendimentos/mês ≈ 1,3 visita por cliente ao mês
+const CUSTOMER_COUNT = 600 // ~1.200 atendimentos/mês ≈ 1,5 visita por cliente ao mês
 
 export const customers: Customer[] = Array.from({ length: CUSTOMER_COUNT }, (_, i) => {
   // pares (nome, sobrenome) únicos: 35 × 32 combinações
@@ -41,8 +43,8 @@ export const customers: Customer[] = Array.from({ length: CUSTOMER_COUNT }, (_, 
   }
 })
 
-/** Dia (relativo a hoje) em que cada cliente passou a frequentar. Metade já era da casa antes do histórico. */
-const joinedOffset = customers.map((_, i) => (hash01(`jn${i}`) < 0.5 ? -HISTORY_DAYS - 1 : -Math.floor(hash01(`jd${i}`) * HISTORY_DAYS)))
+/** Dia (relativo a hoje) em que cada cliente passou a frequentar. 70% já eram da casa antes do histórico. */
+const joinedOffset = customers.map((_, i) => (hash01(`jn${i}`) < 0.7 ? -HISTORY_DAYS - 1 : -Math.floor(hash01(`jd${i}`) * HISTORY_DAYS)))
 const permute = (i: number) => (i * 377) % CUSTOMER_COUNT // embaralha, mas mantém o viés de "clientes frequentes"
 
 /** Escolhe quem foi atendido, só entre clientes que já frequentavam a barbearia naquele dia. */
@@ -89,10 +91,13 @@ export function getMockVisits(now: Date = new Date()): Visit[] {
       grid.forEach((time, i) => {
         if (taken.has(i)) return
         const hour = Number(time.slice(0, 2))
-        const peak = hour === 12 || hour === 13 || hour >= 17 ? 0.2 : 0
-        const weekend = date.getDay() === 6 ? 0.1 : 0
+        const peak = hour === 12 || hour === 13 || hour >= 17 ? 0.14 : 0
+        // negócio em crescimento: crescimento gradual de movimento ao longo do histórico
+        const growth = ((offset + HISTORY_DAYS) / HISTORY_DAYS) * 0.18 - 0.1
+        // sazonalidade: sexta e sábado enchem, começo de semana é mais fraco
+        const weekend = [0, -0.18, -0.12, -0.05, 0, 0.05, 0.09][date.getDay()]
         const key = `${barber.id}|${dateKey}|${time}`
-        if (hash01(key) >= 0.42 + peak + weekend) return
+        if (hash01(key) >= Math.min(0.97, 0.88 + peak + weekend + growth)) return
 
         const service = pickService(`${key}|svc`)
         const need = slotsNeeded(service.duration)
@@ -175,19 +180,19 @@ export const products: Product[] = [
   { id: 'p14', name: 'Café em Cápsulas (cx 50)', category: 'Cortesia', unit: 'caixa', qty: 6, minQty: 3, unitCost: 46.0, supplier: 'Atacadão BH' },
 ]
 
-/** Compras de produtos dos últimos 6 meses (alimentam o "gasto por produto"). */
+/** Compras de produtos dos últimos meses (alimentam o "gasto por produto"). */
 export function getPurchases(now: Date = new Date()): Purchase[] {
   const out: Purchase[] = []
   const thisMonth = startOfMonth(now)
   products.forEach((p, idx) => {
     const every = idx % 3 === 0 ? 1 : 2 // alguns produtos giram mais rápido
-    for (let m = 0; m < 6; m++) {
+    for (let m = 0; m < HISTORY_MONTHS; m++) {
       if ((m + (idx % 2)) % every !== 0 && m !== 0) continue
       const monthStart = addMonths(thisMonth, -m)
       const day = 2 + Math.floor(hash01(`pd${p.id}${m}`) * 24)
       const date = addDays(monthStart, day - 1)
       if (date > now) continue
-      const qty = Math.max(2, Math.round((p.minQty + 2) * (0.8 + hash01(`pq${p.id}${m}`) * 0.8)))
+      const qty = Math.max(2, Math.round((p.minQty + 1) * (0.7 + hash01(`pq${p.id}${m}`) * 0.6)))
       const total = qty * p.unitCost * (0.95 + hash01(`pt${p.id}${m}`) * 0.1)
       out.push({ id: `pu-${p.id}-${m}`, date: format(date, 'yyyy-MM-dd'), productId: p.id, qty, total: Math.round(total * 100) / 100 })
     }
@@ -197,12 +202,12 @@ export function getPurchases(now: Date = new Date()): Purchase[] {
 
 // ───────────── Despesas fixas e variáveis ─────────────
 const fixedExpenses: { category: string; description: string; day: number; base: number; vary: number }[] = [
-  { category: 'Aluguel', description: 'Aluguel do ponto — Savassi', day: 5, base: 4800, vary: 0 },
+  { category: 'Aluguel', description: 'Aluguel do ponto — Savassi', day: 5, base: 4200, vary: 0 },
   { category: 'Energia e água', description: 'Conta de luz', day: 10, base: 640, vary: 0.18 },
   { category: 'Energia e água', description: 'Conta de água', day: 12, base: 190, vary: 0.12 },
   { category: 'Internet e sistemas', description: 'Internet fibra + telefonia', day: 8, base: 169, vary: 0 },
   { category: 'Contabilidade', description: 'Honorários contábeis', day: 15, base: 480, vary: 0 },
-  { category: 'Marketing', description: 'Anúncios Instagram e Google', day: 14, base: 700, vary: 0.25 },
+  { category: 'Marketing', description: 'Anúncios Instagram e Google', day: 14, base: 600, vary: 0.25 },
   { category: 'Limpeza e higiene', description: 'Faxina e materiais de limpeza', day: 6, base: 420, vary: 0.1 },
   { category: 'Manutenção', description: 'Manutenção de equipamentos e cadeiras', day: 20, base: 260, vary: 0.6 },
 ]
@@ -210,7 +215,7 @@ const fixedExpenses: { category: string; description: string; day: number; base:
 export function getExpenses(now: Date = new Date()): Expense[] {
   const out: Expense[] = []
   const thisMonth = startOfMonth(now)
-  for (let m = 0; m < 6; m++) {
+  for (let m = 0; m < HISTORY_MONTHS; m++) {
     const monthStart = addMonths(thisMonth, -m)
     fixedExpenses.forEach((e, i) => {
       const date = addDays(monthStart, e.day - 1)

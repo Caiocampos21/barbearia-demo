@@ -2,6 +2,7 @@ import { format } from 'date-fns'
 import { CalendarClock, Clock, Globe, Percent, Receipt, Scissors, TrendingUp, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { HISTORY_MONTHS } from '../../data/adminSeed'
 import { barbers, services } from '../../data/seed'
 import { useAdminData } from '../../hooks/useAdminData'
 import { isRealized, monthLabel, monthToDate, monthlyFinance, revenueByDay, shortMonth, topServices, upcomingToday } from '../../lib/analytics'
@@ -31,7 +32,7 @@ export default function Dashboard() {
   const { current, prev, deltas } = monthToDate(ds)
   const prevLabel = shortMonth(subMonths(ds.now, 1))
   const byDay = revenueByDay(ds, ds.now)
-  const byMonth = monthlyFinance(ds, 6)
+  const byMonth = monthlyFinance(ds, HISTORY_MONTHS)
   const services$ = topServices(ds, ds.now)
   const upcoming = upcomingToday(ds)
   const todayKey = format(ds.now, 'yyyy-MM-dd')
@@ -187,7 +188,7 @@ export default function Dashboard() {
 
       {/* Mês a mês + serviços */}
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
-        <Card title="Faturamento por mês" subtitle="Últimos 6 meses · o mês atual está em andamento" className="xl:col-span-2">
+        <Card title="Faturamento por mês" subtitle={`Últimos ${HISTORY_MONTHS} meses · o mês atual está em andamento`} className="xl:col-span-2">
           <div className="h-72" role="img" aria-label="Gráfico de barras do faturamento mensal">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={byMonth} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="28%">

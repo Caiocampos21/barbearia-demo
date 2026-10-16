@@ -10,6 +10,7 @@ import KpiCard from '../../components/admin/KpiCard'
 import MonthSelect from '../../components/admin/MonthSelect'
 import PageHeader from '../../components/admin/PageHeader'
 import RankBars from '../../components/admin/RankBars'
+import { HISTORY_MONTHS } from '../../data/adminSeed'
 import { useAdminData } from '../../hooks/useAdminData'
 import { barberStats, expensesByCategory, monthKey, monthLabel, monthlyFinance, productSpend } from '../../lib/analytics'
 import { axisMoney, formatBRL, formatBRL0, formatPercent } from '../../lib/format'
@@ -39,10 +40,8 @@ export default function Finance() {
   const [month, setMonth] = useState(() => startOfMonth(new Date()))
   const isCurrent = monthKey(month) === monthKey(ds.now)
 
-  const series7 = monthlyFinance(ds, 7)
+  const series7 = monthlyFinance(ds, HISTORY_MONTHS + 1)
   const series = series7.slice(1)
-  // o lucro do mês em andamento não entra na linha: despesas fixas já vencidas × receita parcial enganariam
-  const chartData = series.map((r) => (r.key === monthKey(ds.now) ? { ...r, lucro: null } : r))
   const row = series.find((r) => r.key === monthKey(month)) ?? series[series.length - 1]
   const prevRow = series7.find((r) => r.key === monthKey(subMonths(month, 1)))
   const delta = (a: number, b?: number) => (b ? ((a - b) / b) * 100 : undefined)
@@ -55,7 +54,7 @@ export default function Finance() {
   const barbers = barberStats(ds, month)
   const totalCommission = barbers.reduce((a, b) => a + b.commission, 0)
 
-  const compareHint = isCurrent ? 'parcial, até hoje' : prevRow ? `vs. mês anterior` : undefined
+  const compareHint = isCurrent ? 'parcial · despesas fixas proporcionais' : prevRow ? `vs. mês anterior` : undefined
 
   return (
     <>
@@ -68,10 +67,10 @@ export default function Finance() {
         <KpiCard label="Margem de lucro" icon={Landmark} value={margin * 100} format={(n) => `${n.toFixed(0)}%`} hint="lucro ÷ receita" delay={240} />
       </div>
 
-      <Card title="Receitas × despesas" subtitle="Últimos 6 meses · o mês atual está em andamento e não entra na linha de lucro" className="mt-6" action={<Legend />}>
+      <Card title="Receitas × despesas" subtitle={`Últimos ${HISTORY_MONTHS} meses · o mês atual é parcial (despesas fixas proporcionais aos dias decorridos)`} className="mt-6" action={<Legend />}>
         <div className="h-72 sm:h-80" role="img" aria-label="Gráfico de barras comparando receitas e despesas por mês, com linha de lucro">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="24%" barGap={4}>
+            <ComposedChart data={series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="24%" barGap={4}>
               <CartesianGrid stroke={chartColors.grid} vertical={false} />
               <XAxis dataKey="label" {...axisProps} />
               <YAxis {...axisProps} tickFormatter={axisMoney} width={44} domain={[0, (max: number) => Math.ceil(max / 10000) * 10000]} tickCount={5} />
