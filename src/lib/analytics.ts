@@ -253,6 +253,15 @@ export function barberStats(ds: Dataset, month: Date) {
     .sort((a, b) => b.revenue - a.revenue)
 }
 
+/** Faturamento mensal de cada barbeiro (para o gráfico de evolução). */
+export function barberMonthly(ds: Dataset, n = 6) {
+  return lastMonths(ds.now, n).map((m) => {
+    const row: Record<string, string | number> = { key: monthKey(m), label: shortMonth(m) }
+    for (const b of barbers) row[b.id] = sum(ds.visits.filter((v) => v.barberId === b.id && inMonth(v.date, m) && isRealized(v)), (v) => v.price)
+    return row
+  })
+}
+
 // ───────────── Clientes ─────────────
 export interface CustomerStat {
   id: string
