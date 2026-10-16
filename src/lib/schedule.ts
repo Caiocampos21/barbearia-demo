@@ -1,41 +1,16 @@
-import { addDays, addMinutes, format, isSameDay, parse, startOfDay } from 'date-fns'
+import { addDays, addMinutes, isSameDay, parse, startOfDay } from 'date-fns'
+import { getMockBusy } from '../data/adminSeed'
 import { services, weekHours } from '../data/seed'
+import { SLOT_MINUTES, buildDayGrid, slotsNeeded } from './grid'
 import type { Appointment, Barber, Service, Slot } from './types'
 import { toDateKey } from './format'
 
-export const SLOT_MINUTES = 30
+export { SLOT_MINUTES }
 export const BOOKING_WINDOW_DAYS = 21
 
-/** Hash determinístico (FNV-1a) → número em [0, 1). Gera a agenda "ocupada" do mock. */
-function hash01(input: string) {
-  let h = 2166136261
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i)
-    h = Math.imul(h, 16777619)
-  }
-  return ((h >>> 0) % 10000) / 10000
-}
+const slotsFor = (service: Service) => slotsNeeded(service.duration)
 
-const slotsNeeded = (service: Service) => Math.ceil(service.duration / SLOT_MINUTES)
-
-function buildDayGrid(date: Date): string[] {
-  const hours = weekHours[date.getDay()]
-  if (!hours) return []
-  const open = parse(hours.open, 'HH:mm', date)
-  const close = parse(hours.close, 'HH:mm', date)
-  const grid: string[] = []
-  for (let t = open; t < close; t = addMinutes(t, SLOT_MINUTES)) grid.push(format(t, 'HH:mm'))
-  return grid
-}
-
-/** Ocupação "de fundo" (clientes fictícios) — mais cheio perto do almoço e fim de tarde. */
-function isMockBusy(barberId: string, dateKey: string, time: string) {
-  const hour = Number(time.slice(0, 2))
-  const peak = hour === 12 || hour === 13 || hour >= 17 ? 0.18 : 0
-  return hash01(`${barberId}|${dateKey}|${time}`) < 0.3 + peak
-}
-
-/** Conjunto de horários ocupados por agendamentos reais salvos no navegador. */
+/** Horários ocupados por agendamentos reais salvos no navegador (site do cliente). */
 function bookedSet(barberId: string, dateKey: string, grid: string[], appts: Appointment[]) {
   const busy = new Set<string>()
   for (const a of appts) {
@@ -43,7 +18,7 @@ function bookedSet(barberId: string, dateKey: string, grid: string[], appts: App
     const svc = services.find((s) => s.id === a.serviceId)
     const start = grid.indexOf(a.time)
     if (start === -1) continue
-    const n = svc ? slotsNeeded(svc) : 1
+    const n = svc ? slotsFor(svc) : 1
     for (let i = 0; i < n; i++) if (grid[start + i]) busy.add(grid[start + i])
   }
   return busy
@@ -68,13 +43,14 @@ export function getDaySlots(
   const grid = buildDayGrid(date)
   if (!grid.length) return []
   const dateKey = toDateKey(date)
-  const need = slotsNeeded(service)
+  const need = slotsFor(service)
 
   const perBarber = barbers
     .filter((b) => !isBarberOff(b, date))
     .map((b) => {
       const booked = bookedSet(b.id, dateKey, grid, appts)
-      return { id: b.id, busy: (t: string) => booked.has(t) || isMockBusy(b.id, dateKey, t) }
+      const mock = getMockBusy(b.id, dateKey)
+      return { id: b.id, busy: (t: string) => booked.has(t) || mock.has(t) }
     })
 
   return grid.map((time, i) => {

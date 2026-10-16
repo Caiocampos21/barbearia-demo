@@ -6,12 +6,14 @@ interface Props {
   decimals?: number
   suffix?: string
   duration?: number
+  /** Formatação própria (ex.: moeda). Substitui decimals/suffix. */
+  format?: (n: number) => string
 }
 
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
 
 /** Número que "sobe" até o valor final quando aparece na tela. */
-export default function CountUp({ value, decimals = 0, suffix = '', duration = 1600 }: Props) {
+export default function CountUp({ value, decimals = 0, suffix = '', duration = 1600, format }: Props) {
   const { ref, inView } = useInView<HTMLSpanElement>(0.4)
   const [current, setCurrent] = useState(0)
 
@@ -33,14 +35,14 @@ export default function CountUp({ value, decimals = 0, suffix = '', duration = 1
     return () => cancelAnimationFrame(raf)
   }, [inView, value, duration])
 
-  const text = current.toLocaleString('pt-BR', {
+  const text = format ? format(current) : current.toLocaleString('pt-BR', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   })
   return (
     <span ref={ref}>
       {text}
-      {suffix}
+      {format ? '' : suffix}
     </span>
   )
 }

@@ -38,3 +38,12 @@ export const isValidPhone = (value: string) => {
 }
 
 export const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? ''
+
+const brl0 = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
+/** Moeda sem centavos (cards e gráficos). */
+export const formatBRL0 = (value: number) => brl0.format(Math.round(value))
+
+/** Eixo de gráfico: 1250 → "1,3k". */
+export const axisMoney = (value: number) => (Math.abs(value) >= 1000 ? `${(value / 1000).toFixed(1).replace('.', ',').replace(',0', '')}k` : String(value))
+
+export const formatPercent = (ratio: number, digits = 0) => `${(ratio * 100).toFixed(digits).replace('.', ',')}%`

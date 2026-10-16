@@ -58,6 +58,10 @@ export default function Footer() {
         </p>
         <p className="mt-1">
           Desenvolvido por <span className="font-semibold text-gold-500">CAIOCAMPOS.DEV</span>
+          {' · '}
+          <Link to="/painel" className="hover:text-gold-300">
+            Painel do dono
+          </Link>
         </p>
       </div>
     </footer>

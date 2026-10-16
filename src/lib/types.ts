@@ -75,3 +75,57 @@ export interface Slot {
   available: boolean
   barberIds: string[] // barbeiros livres neste horário
 }
+
+// ───────────── Painel do dono ─────────────
+export type VisitStatus = 'concluido' | 'confirmado' | 'pendente' | 'cancelado'
+
+/** Um atendimento (passado ou futuro), vindo do mock ou do site (localStorage). */
+export interface Visit {
+  id: string
+  date: string // 'yyyy-MM-dd'
+  time: string // 'HH:mm'
+  serviceId: string
+  barberId: string
+  customerId: string
+  customerName: string
+  customerPhone: string
+  price: number
+  status: VisitStatus
+  source: 'balcao' | 'site'
+  rating?: number
+  paymentMethod?: PaymentMethod
+}
+
+export interface Customer {
+  id: string
+  name: string
+  phone: string
+  birthday: string // 'MM-dd'
+}
+
+export interface Expense {
+  id: string
+  date: string
+  category: string
+  description: string
+  amount: number
+}
+
+export interface Product {
+  id: string
+  name: string
+  category: string
+  unit: string
+  qty: number
+  minQty: number
+  unitCost: number
+  supplier: string
+}
+
+export interface Purchase {
+  id: string
+  date: string
+  productId: string
+  qty: number
+  total: number
+}
