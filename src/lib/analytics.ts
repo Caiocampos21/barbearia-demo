@@ -325,7 +325,8 @@ export function birthdaysOfMonth(stats: CustomerStat[], month: Date) {
 }
 
 // ───────────── Estoque ─────────────
-export const stockLevel = (p: Product) => (p.qty <= p.minQty * 0.5 ? 'critico' : p.qty < p.minQty ? 'baixo' : 'ok')
+export type StockLevel = 'critico' | 'baixo' | 'ok'
+export const stockLevel = (p: Product): StockLevel => (p.qty <= p.minQty * 0.5 ? 'critico' : p.qty < p.minQty ? 'baixo' : 'ok')
 
 // ───────────── Agenda ─────────────
 export const visitsOnDay = (ds: Dataset, dateKey: string) => ds.visits.filter((v) => v.date === dateKey && isActive(v)).sort((a, b) => a.time.localeCompare(b.time))
