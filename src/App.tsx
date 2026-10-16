@@ -8,7 +8,9 @@ import Payment from './pages/Payment'
 import Receipt from './pages/Receipt'
 import Dashboard from './pages/admin/Dashboard'
 import Barbers from './pages/admin/Barbers'
+import Customers from './pages/admin/Customers'
 import Finance from './pages/admin/Finance'
+import Stock from './pages/admin/Stock'
 
 export default function App() {
   return (
@@ -24,6 +26,8 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="financeiro" element={<Finance />} />
         <Route path="barbeiros" element={<Barbers />} />
+        <Route path="clientes" element={<Customers />} />
+        <Route path="estoque" element={<Stock />} />
       </Route>
     </Routes>
   )
