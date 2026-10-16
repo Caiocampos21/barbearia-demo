@@ -8,7 +8,7 @@ import { barbers, services } from './seed'
 /** Comissão paga a cada barbeiro sobre o faturamento gerado. */
 export const commissionRates: Record<string, number> = { rafael: 0.5, thiago: 0.45, bruno: 0.4, leo: 0.4 }
 
-const HISTORY_DAYS = 190
+const HISTORY_DAYS = 420 // > 1 ano de histórico: assim "novo × recorrente" não é distorcido pelo início dos dados
 const FUTURE_DAYS = 30
 
 // Peso de cada serviço no mix de vendas (soma = 1).
@@ -24,19 +24,35 @@ const serviceWeights: [string, number][] = [
 const firstNames = ['Lucas', 'Gabriel', 'Mateus', 'Pedro', 'João', 'Rafael', 'Bruno', 'Felipe', 'Gustavo', 'Henrique', 'Rodrigo', 'Thiago', 'André', 'Leonardo', 'Daniel', 'Vinícius', 'Eduardo', 'Marcelo', 'Fernando', 'Ricardo', 'Diego', 'Samuel', 'Caio', 'Arthur', 'Davi', 'Renato', 'Alexandre', 'Matheus', 'Otávio', 'Luiz', 'Igor', 'Murilo', 'Victor', 'Paulo', 'Sérgio']
 const lastNames = ['Silva', 'Souza', 'Oliveira', 'Santos', 'Pereira', 'Costa', 'Rodrigues', 'Almeida', 'Nascimento', 'Lima', 'Araújo', 'Fernandes', 'Carvalho', 'Gomes', 'Martins', 'Rocha', 'Ribeiro', 'Alves', 'Monteiro', 'Mendes', 'Barros', 'Freitas', 'Barbosa', 'Pinto', 'Moreira', 'Cavalcanti', 'Dias', 'Castro', 'Campos', 'Cardoso', 'Teixeira', 'Machado']
 
-export const customers: Customer[] = Array.from({ length: 170 }, (_, i) => {
-  const first = firstNames[Math.floor(hash01(`fn${i}`) * firstNames.length)]
-  const last = lastNames[Math.floor(hash01(`ln${i}`) * lastNames.length)]
+const CUSTOMER_COUNT = 900 // ~1.200 atendimentos/mês ≈ 1,3 visita por cliente ao mês
+
+export const customers: Customer[] = Array.from({ length: CUSTOMER_COUNT }, (_, i) => {
+  // pares (nome, sobrenome) únicos: 35 × 32 combinações
+  const first = firstNames[(i * 13) % firstNames.length]
+  const last = lastNames[(Math.floor(i / firstNames.length) * 5) % lastNames.length]
   const month = 1 + Math.floor(hash01(`bm${i}`) * 12)
   const day = 1 + Math.floor(hash01(`bd${i}`) * 28)
   const n = Math.floor(10000000 + hash01(`ph${i}`) * 89999999)
   return {
-    id: `c${String(i + 1).padStart(3, '0')}`,
+    id: `c${String(i + 1).padStart(4, '0')}`,
     name: `${first} ${last}`,
     phone: `(31) 9${String(n).slice(0, 4)}-${String(n).slice(4, 8)}`,
     birthday: `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
   }
 })
+
+/** Dia (relativo a hoje) em que cada cliente passou a frequentar. Metade já era da casa antes do histórico. */
+const joinedOffset = customers.map((_, i) => (hash01(`jn${i}`) < 0.5 ? -HISTORY_DAYS - 1 : -Math.floor(hash01(`jd${i}`) * HISTORY_DAYS)))
+const permute = (i: number) => (i * 377) % CUSTOMER_COUNT // embaralha, mas mantém o viés de "clientes frequentes"
+
+/** Escolhe quem foi atendido, só entre clientes que já frequentavam a barbearia naquele dia. */
+function pickCustomer(key: string, offset: number) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const idx = permute(Math.floor(Math.pow(hash01(`${key}|cust${attempt}`), 1.35) * CUSTOMER_COUNT))
+    if (joinedOffset[idx] <= offset) return customers[idx]
+  }
+  return customers[permute(Math.floor(hash01(`${key}|fb`) * CUSTOMER_COUNT * 0.1))] // clientes antigos
+}
 
 const pickService = (key: string) => {
   let r = hash01(key)
@@ -83,7 +99,7 @@ export function getMockVisits(now: Date = new Date()): Visit[] {
         if (i + need > grid.length) return
         for (let k = 0; k < need; k++) taken.add(i + k)
 
-        const cust = customers[Math.floor(Math.pow(hash01(`${key}|cust`), 1.7) * customers.length)]
+        const cust = pickCustomer(key, offset)
         const startMs = new Date(`${dateKey}T${time}:00`).getTime()
         const endMs = startMs + service.duration * 60_000
 

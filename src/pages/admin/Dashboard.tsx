@@ -5,7 +5,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, Res
 import { barbers, services } from '../../data/seed'
 import { useAdminData } from '../../hooks/useAdminData'
 import { isRealized, monthLabel, monthToDate, monthlyFinance, revenueByDay, shortMonth, topServices, upcomingToday } from '../../lib/analytics'
-import { axisMoney, formatBRL, formatBRL0, formatPercent } from '../../lib/format'
+import { axisMoney, formatBRL, formatBRL0, formatPercent, shortDate } from '../../lib/format'
 import Card from '../../components/admin/Card'
 import ChartTooltip from '../../components/admin/ChartTooltip'
 import { axisProps, chartColors } from '../../components/admin/chartTheme'
@@ -36,6 +36,7 @@ export default function Dashboard() {
   const upcoming = upcomingToday(ds)
   const todayKey = format(ds.now, 'yyyy-MM-dd')
   const todayDone = ds.visits.filter((v) => v.date === todayKey && isRealized(v))
+  const siteVisits = ds.visits.filter((v) => v.source === 'site' && v.status !== 'cancelado').sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time)).slice(0, 4)
   const totalServiceCount = services$.reduce((a, s) => a + s.count, 0)
 
   return (
@@ -114,6 +115,7 @@ export default function Dashboard() {
           </div>
         </Card>
 
+        <div className="min-w-0 space-y-6">
         <Card title="Próximos de hoje" subtitle={upcoming.length ? `${upcoming.length} na fila` : 'Agenda do dia'} action={<Link to="/painel/agenda" className="text-sm font-semibold text-gold-400 hover:text-gold-300">Ver agenda →</Link>}>
           {upcoming.length === 0 ? (
             <p className="rounded-xl border border-dashed border-white/12 p-6 text-center text-sm text-ink-300">Sem mais atendimentos hoje. Bom descanso!</p>
@@ -152,6 +154,35 @@ export default function Dashboard() {
             Hoje já foram <strong className="text-ink-100">{todayDone.length}</strong> atendimentos · <strong className="text-gold-300">{formatBRL0(todayDone.reduce((a, v) => a + v.price, 0))}</strong>
           </p>
         </Card>
+
+        <Card title="Chegando pelo site" subtitle="Agendamentos feitos pelos clientes online">
+          {siteVisits.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-white/12 p-5 text-center text-sm text-ink-300">
+              <Globe className="mx-auto mb-2 size-6 text-gold-500" aria-hidden />
+              Nenhum ainda. Faça um agendamento no{' '}
+              <Link to="/agendar" className="font-semibold text-gold-300 hover:text-gold-200">
+                site do cliente
+              </Link>{' '}
+              e veja aparecer aqui na hora.
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {siteVisits.map((v) => (
+                <li key={v.id} className="flex items-center gap-3 rounded-xl bg-ink-800/60 p-3 text-sm">
+                  <Globe className="size-4 shrink-0 text-gold-400" aria-hidden />
+                  <span className="min-w-0 flex-1 leading-tight">
+                    <strong className="block truncate text-ink-100">{v.customerName}</strong>
+                    <span className="text-xs text-ink-400">
+                      {services.find((s) => s.id === v.serviceId)?.name} · {shortDate(v.date)} {v.time}
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-semibold tabular-nums text-ink-200">{formatBRL0(v.price)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
+        </div>
       </div>
 
       {/* Mês a mês + serviços */}

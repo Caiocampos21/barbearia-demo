@@ -52,7 +52,7 @@ export default function Stock() {
             <AlertTriangle className="size-5 text-danger" aria-hidden />
             {alerts.length} {alerts.length === 1 ? 'produto precisa' : 'produtos precisam'} de reposição
           </h2>
-          <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
             {alerts.map(({ p, level }) => {
               const L = levelInfo[level]
               return (

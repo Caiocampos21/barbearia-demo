@@ -5,6 +5,16 @@ Sistema de demonstração para barbearias: site do cliente com landing, agendame
 
 Stack: React + Vite + TypeScript · Tailwind CSS v4 · react-router-dom · Recharts · lucide-react · date-fns.
 
+## Rotas
+
+| Rota | O que é |
+|---|---|
+| `/` | Landing da barbearia |
+| `/agendar` | Fluxo de agendamento (5 passos) |
+| `/pagamento/:id` · `/comprovante/:id` | Pagamento simulado e comprovante |
+| `/painel` | **Painel do dono**: dashboard |
+| `/painel/agenda` · `/financeiro` · `/barbeiros` · `/clientes` · `/estoque` | Demais seções do painel |
+
 ## Como rodar
 
 Requisitos: [Node.js](https://nodejs.org) 20 ou superior.
@@ -42,8 +52,11 @@ O arquivo `public/_redirects` já está configurado para que as rotas do React R
 src/
   components/   layout/ · home/ · booking/ · payment/ · ui/
   pages/        Home, Booking, Payment, Receipt, NotFound
+  pages/admin/  Dashboard, Agenda, Financeiro, Barbeiros, Clientes, Estoque
+  components/admin/  sidebar, cards de KPI, tooltips e tema dos gráficos
   data/seed.ts  serviços, barbeiros, horários, avaliações (dados fictícios)
-  lib/          agenda (schedule), storage (localStorage), formatação, tipos
+  data/adminSeed.ts  dados mock do painel (atendimentos, clientes, despesas, estoque)
+  lib/          agenda (schedule), analytics (cálculos do painel), storage, formatação, tipos
   hooks/        useInView
 ```
 
@@ -52,6 +65,15 @@ src/
 - Dados do negócio, serviços, equipe e horários: `src/data/seed.ts`
 - Cores, fontes, raios e sombras (tokens): `src/index.css` (bloco `@theme`)
 - Fotos: IDs do Unsplash em `galleryIds` (`seed.ts`); troque pelas fotos reais do cliente.
+
+## Painel do dono
+
+- **Fonte única de dados:** `src/data/adminSeed.ts` gera ~14 meses de atendimentos, 900 clientes, despesas e compras de
+  produtos, sempre relativos a "hoje". A agenda do site e a do painel usam a MESMA base, então os horários batem.
+- **Integração com o site:** agendamentos feitos em `/agendar` (localStorage) aparecem na Agenda, no Dashboard
+  ("Chegando pelo site") e em Clientes, marcados com o selo "site".
+- **Para usar dados reais:** substitua as funções de `adminSeed.ts`; as telas leem tudo via `src/lib/analytics.ts`.
+- Comissões por barbeiro: `commissionRates` em `adminSeed.ts`.
 
 ## Como funciona a demonstração
 

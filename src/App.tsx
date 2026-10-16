@@ -7,6 +7,7 @@ import NotFound from './pages/NotFound'
 import Payment from './pages/Payment'
 import Receipt from './pages/Receipt'
 import Dashboard from './pages/admin/Dashboard'
+import Agenda from './pages/admin/Agenda'
 import Barbers from './pages/admin/Barbers'
 import Customers from './pages/admin/Customers'
 import Finance from './pages/admin/Finance'
@@ -24,6 +25,7 @@ export default function App() {
       </Route>
       <Route path="painel" element={<AdminLayout />}>
         <Route index element={<Dashboard />} />
+        <Route path="agenda" element={<Agenda />} />
         <Route path="financeiro" element={<Finance />} />
         <Route path="barbeiros" element={<Barbers />} />
         <Route path="clientes" element={<Customers />} />
