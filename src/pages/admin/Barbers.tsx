@@ -44,16 +44,16 @@ export default function Barbers() {
               <div className="flex items-start gap-3">
                 <BarberAvatar initials={s.initials} gradient={s.gradient} size="lg" />
                 <div className="min-w-0 leading-tight">
-                  <h2 className="truncate font-display text-lg font-semibold">{s.name}</h2>
+                  <h2 className="font-display text-lg font-semibold">{s.name}</h2>
                   <p className="text-xs text-ink-400">{s.role}</p>
                   <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-gold-300">
                     <Star className="size-3.5 fill-current" aria-hidden />
-                    {s.rating.toFixed(2).replace('.', ',')}
+                    {s.rating.toFixed(1).replace('.', ',')}
                     <span className="text-xs font-normal text-ink-400">({s.ratings})</span>
                   </p>
                 </div>
-                <span className={`ml-auto grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold ${i === 0 ? 'bg-gold-500 text-ink-950' : 'bg-ink-800 text-ink-300'}`} aria-label={`${i + 1}º lugar`}>
-                  {i === 0 ? <Crown className="size-4" aria-hidden /> : i + 1}
+                <span className={`absolute -top-3 right-4 grid size-7 place-items-center rounded-full text-xs font-bold ring-4 ring-ink-950 ${i === 0 ? 'bg-gold-500 text-ink-950' : 'bg-ink-800 text-ink-300'}`} aria-label={`${i + 1}º lugar`}>
+                  {i === 0 ? <Crown className="size-3.5" aria-hidden /> : i + 1}
                 </span>
               </div>
 

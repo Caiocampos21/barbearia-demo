@@ -234,7 +234,8 @@ export function barberStats(ds: Dataset, month: Date) {
       const done = mine.filter(isRealized)
       const revenue = sum(done, (v) => v.price)
       const rated = ds.visits.filter((v) => v.barberId === b.id && v.rating)
-      const rating = rated.length ? sum(rated, (v) => v.rating ?? 0) / rated.length : b.rating
+      // a nota exibida é a oficial da equipe (a mesma da landing); as avaliações do mock só compõem a contagem
+      const rating = b.rating
       const rate = commissionRates[b.id] ?? 0.4
       return {
         id: b.id,

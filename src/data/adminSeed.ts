@@ -71,6 +71,13 @@ let visitsCache: { key: string; visits: Visit[] } | null = null
  * Gera a agenda de todos os barbeiros. É a ÚNICA fonte de horários ocupados:
  * o site do cliente e o painel enxergam exatamente a mesma agenda.
  */
+const popularity: Record<string, { base: number; slope: number }> = {
+  rafael: { base: 0.05, slope: 0 },
+  thiago: { base: 0, slope: 0.16 },
+  leo: { base: -0.04, slope: 0 },
+  bruno: { base: -0.1, slope: -0.04 },
+}
+
 export function getMockVisits(now: Date = new Date()): Visit[] {
   const todayKey = format(now, 'yyyy-MM-dd')
   if (visitsCache?.key === todayKey) return visitsCache.visits
@@ -96,8 +103,11 @@ export function getMockVisits(now: Date = new Date()): Visit[] {
         const growth = ((offset + HISTORY_DAYS) / HISTORY_DAYS) * 0.18 - 0.1
         // sazonalidade: sexta e sábado enchem, começo de semana é mais fraco
         const weekend = [0, -0.18, -0.12, -0.05, 0, 0.05, 0.09][date.getDay()]
+        // popularidade: o fundador lota mais, o Thiago está em alta e o Bruno ainda constrói clientela
+        const pop = popularity[barber.id]
+        const fame = pop.base + pop.slope * ((offset + HISTORY_DAYS) / HISTORY_DAYS - 0.5)
         const key = `${barber.id}|${dateKey}|${time}`
-        if (hash01(key) >= Math.min(0.97, 0.88 + peak + weekend + growth)) return
+        if (hash01(key) >= Math.min(0.97, 0.88 + peak + weekend + growth + fame)) return
 
         const service = pickService(`${key}|svc`)
         const need = slotsNeeded(service.duration)
