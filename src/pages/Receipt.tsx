@@ -1,3 +1,4 @@
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Check, Printer } from 'lucide-react'
 import { useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
@@ -15,6 +16,7 @@ const Line = ({ label, value }: { label: string; value: string }) => (
 )
 
 export default function Receipt() {
+  usePageTitle('Comprovante')
   const { id = '' } = useParams()
   const [appt] = useState(() => getAppointment(id))
 

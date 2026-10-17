@@ -1,13 +1,17 @@
 import { FlaskConical, Menu, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { usePageTitle } from '../../hooks/usePageTitle'
 import { monthLabel } from '../../lib/analytics'
+import ResetDemo from '../ui/ResetDemo'
+import PanelSkeleton from './PanelSkeleton'
 import Logo from '../layout/Logo'
 import Sidebar from './Sidebar'
 
 export default function AdminLayout() {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
+  usePageTitle('Painel do dono')
 
   useEffect(() => {
     setOpen(false)
@@ -57,10 +61,15 @@ export default function AdminLayout() {
             <FlaskConical className="size-3.5" aria-hidden />
             Modo demonstração · dados fictícios
           </span>
-          <span className="font-medium text-ink-300">{monthLabel(new Date())}</span>
+          <span className="flex items-center gap-3">
+            <span className="font-medium text-ink-300">{monthLabel(new Date())}</span>
+            <ResetDemo className="flex h-8 items-center gap-1.5 rounded-pill border border-white/12 px-3 font-semibold text-ink-200 transition-colors hover:border-gold-500/50 hover:text-gold-300" />
+          </span>
         </div>
         <main key={pathname} className="animate-page-in">
-          <Outlet />
+          <Suspense fallback={<PanelSkeleton />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

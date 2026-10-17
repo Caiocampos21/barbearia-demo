@@ -39,6 +39,17 @@ export function updateAppointment(id: string, patch: Partial<Appointment>): Appo
   return updated
 }
 
+/** Apaga tudo que a demo salvou no navegador. Os dados mock são gerados do zero a cada carregamento. */
+export function resetDemo() {
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith('navalha:'))
+      .forEach((k) => localStorage.removeItem(k))
+  } catch {
+    // sem acesso ao storage: nada a limpar
+  }
+}
+
 export function newId(prefix = 'ag') {
   const rand = Math.random().toString(36).slice(2, 8).toUpperCase()
   return `${prefix}-${Date.now().toString(36).toUpperCase().slice(-5)}${rand}`

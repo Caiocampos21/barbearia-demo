@@ -67,6 +67,16 @@ export function getDaySlots(
   })
 }
 
+/** Primeiro horário livre (qualquer barbeiro) para o serviço, a partir de agora. */
+export function nextFreeSlot(barbers: Barber[], service: Service, appts: Appointment[], now: Date = new Date()) {
+  for (let i = 0; i < BOOKING_WINDOW_DAYS; i++) {
+    const date = addDays(startOfDay(now), i)
+    const slot = getDaySlots(date, barbers, service, appts, now).find((s) => s.available)
+    if (slot) return { date, key: toDateKey(date), time: slot.time, barberId: slot.barberIds[0], isToday: i === 0, isTomorrow: i === 1 }
+  }
+  return null
+}
+
 export interface DayOption {
   date: Date
   key: string

@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import AdminLayout from './components/admin/AdminLayout'
 import Layout from './components/layout/Layout'
@@ -6,12 +7,15 @@ import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 import Payment from './pages/Payment'
 import Receipt from './pages/Receipt'
-import Dashboard from './pages/admin/Dashboard'
-import Agenda from './pages/admin/Agenda'
-import Barbers from './pages/admin/Barbers'
-import Customers from './pages/admin/Customers'
-import Finance from './pages/admin/Finance'
-import Stock from './pages/admin/Stock'
+import AdminNotFound from './pages/admin/AdminNotFound'
+
+// O painel (com Recharts) só é baixado quando alguém abre /painel: o site do cliente fica leve.
+const Dashboard = lazy(() => import('./pages/admin/Dashboard'))
+const Agenda = lazy(() => import('./pages/admin/Agenda'))
+const Finance = lazy(() => import('./pages/admin/Finance'))
+const Barbers = lazy(() => import('./pages/admin/Barbers'))
+const Customers = lazy(() => import('./pages/admin/Customers'))
+const Stock = lazy(() => import('./pages/admin/Stock'))
 
 export default function App() {
   return (
@@ -30,6 +34,7 @@ export default function App() {
         <Route path="barbeiros" element={<Barbers />} />
         <Route path="clientes" element={<Customers />} />
         <Route path="estoque" element={<Stock />} />
+        <Route path="*" element={<AdminNotFound />} />
       </Route>
     </Routes>
   )

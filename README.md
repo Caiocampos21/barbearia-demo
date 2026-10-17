@@ -1,18 +1,24 @@
-# Barbearia Navalha de Ouro — Demo
+# Barbearia Navalha de Ouro — Sistema de demonstração
 
-Sistema de demonstração para barbearias: site do cliente com landing, agendamento online e pagamento simulado.
-**Todos os dados são fictícios** e ficam salvos apenas no navegador (localStorage). Não existe backend.
+Demo completa de um sistema para barbearias, feita para **mostrar a donos de barbearia** como fica um site profissional:
 
-Stack: React + Vite + TypeScript · Tailwind CSS v4 · react-router-dom · Recharts · lucide-react · date-fns.
+- **Site do cliente** (`/`): landing premium, agendamento online em 5 passos e pagamento simulado (PIX e cartão) com comprovante.
+- **Painel do dono** (`/painel`): dashboard, agenda, financeiro, barbeiros, clientes e estoque, com gráficos.
+
+Tudo é **100% front-end** (sem backend). Os dados são fictícios e os agendamentos feitos no site ficam no `localStorage`
+do navegador, aparecendo também no painel. Em todas as telas há aviso de "ambiente de demonstração" e um botão
+**Resetar dados** para voltar ao estado original.
+
+**Stack:** React + Vite + TypeScript · Tailwind CSS v4 · react-router-dom · Recharts · lucide-react · date-fns.
 
 ## Rotas
 
 | Rota | O que é |
 |---|---|
 | `/` | Landing da barbearia |
-| `/agendar` | Fluxo de agendamento (5 passos) |
+| `/agendar` | Fluxo de agendamento |
 | `/pagamento/:id` · `/comprovante/:id` | Pagamento simulado e comprovante |
-| `/painel` | **Painel do dono**: dashboard |
+| `/painel` | Dashboard do dono |
 | `/painel/agenda` · `/financeiro` · `/barbeiros` · `/clientes` · `/estoque` | Demais seções do painel |
 
 ## Como rodar
@@ -34,50 +40,70 @@ npm run lint     # verifica o código
 
 ## Como publicar no Netlify
 
-**Opção A — arrastar e soltar (mais rápida)**
-1. Rode `npm run build`.
-2. Acesse [app.netlify.com/drop](https://app.netlify.com/drop) e arraste a pasta `dist/`.
+O projeto já tem `netlify.toml` (comando de build, pasta `dist`, redirecionamento das rotas e cache) e
+`public/_redirects`. Escolha uma das opções:
 
-**Opção B — via GitHub (deploy automático a cada push)**
+**Opção A — arrastar e soltar (mais rápida, 2 minutos)**
+1. No terminal, na pasta do projeto: `npm install` e depois `npm run build`.
+2. Acesse [app.netlify.com/drop](https://app.netlify.com/drop) (faça login se pedir).
+3. Arraste a pasta **`dist`** para a página. O site fica no ar com um endereço `nome-aleatorio.netlify.app`.
+4. Para trocar o endereço: *Site configuration → Change site name*.
+
+**Opção B — pelo GitHub (publica sozinho a cada `git push`)**
 1. Suba o projeto para um repositório no GitHub.
-2. No Netlify: *Add new site → Import an existing project* e escolha o repositório.
-3. Configure: **Build command** `npm run build` · **Publish directory** `dist`.
+2. No Netlify: *Add new site → Import an existing project → GitHub* e escolha o repositório.
+3. As configurações vêm do `netlify.toml` (build `npm run build`, publish `dist`). Clique em *Deploy*.
 
-O arquivo `public/_redirects` já está configurado para que as rotas do React Router
-(`/agendar`, `/pagamento/...`) funcionem ao recarregar a página.
+**Opção C — pelo terminal (Netlify CLI)**
+```bash
+npx netlify-cli login
+npx netlify-cli deploy --prod --dir=dist   # após npm run build
+```
+
+Para usar domínio próprio (ex.: `demo.caiocampos.dev`): *Domain management → Add a domain* no painel do Netlify.
 
 ## Estrutura
 
 ```
 src/
-  components/   layout/ · home/ · booking/ · payment/ · ui/
-  pages/        Home, Booking, Payment, Receipt, NotFound
-  pages/admin/  Dashboard, Agenda, Financeiro, Barbeiros, Clientes, Estoque
-  components/admin/  sidebar, cards de KPI, tooltips e tema dos gráficos
-  data/seed.ts  serviços, barbeiros, horários, avaliações (dados fictícios)
-  data/adminSeed.ts  dados mock do painel (atendimentos, clientes, despesas, estoque)
-  lib/          agenda (schedule), analytics (cálculos do painel), storage, formatação, tipos
-  hooks/        useInView
+  components/
+    layout/ home/ booking/ payment/ ui/   site do cliente
+    admin/                                sidebar, KPIs, tooltips e tema dos gráficos
+  pages/         Home, Booking, Payment, Receipt, NotFound
+  pages/admin/   Dashboard, Agenda, Finance, Barbers, Customers, Stock
+  data/
+    seed.ts       negócio, serviços, barbeiros, horários, avaliações, galeria
+    adminSeed.ts  gerador dos dados do painel (atendimentos, clientes, despesas, estoque)
+  lib/           agenda (schedule/grid), analytics (cálculos do painel), storage, formatação, tipos
+  hooks/         useInView, useAdminData, usePageTitle
 ```
 
-## Personalizar para um cliente real
+## Como funcionam os dados
 
-- Dados do negócio, serviços, equipe e horários: `src/data/seed.ts`
-- Cores, fontes, raios e sombras (tokens): `src/index.css` (bloco `@theme`)
-- Fotos: IDs do Unsplash em `galleryIds` (`seed.ts`); troque pelas fotos reais do cliente.
+- **Uma fonte única:** `adminSeed.ts` gera ~4 meses de histórico (≈ 600 clientes, ≈ 1.000 atendimentos/mês, preços
+  reais de BH, mais movimento sexta e sábado) e agenda futura. O site e o painel usam a mesma base, então os horários batem.
+- Os dados são **determinísticos** e **relativos a "hoje"**: todo dia o mês atual aparece preenchido e igual para qualquer pessoa.
+- Agendamentos feitos em `/agendar` entram na Agenda, no Dashboard ("Chegando pelo site") e em Clientes, com selo "site".
+- No mês em andamento, as despesas fixas entram proporcionais aos dias decorridos (regime de competência).
+- **Resetar dados** (botão no painel e no selo no canto do site) apaga as chaves `navalha:*` do `localStorage` e recarrega.
 
-## Painel do dono
+## O que dá pra personalizar por cliente
 
-- **Fonte única de dados:** `src/data/adminSeed.ts` gera ~14 meses de atendimentos, 900 clientes, despesas e compras de
-  produtos, sempre relativos a "hoje". A agenda do site e a do painel usam a MESMA base, então os horários batem.
-- **Integração com o site:** agendamentos feitos em `/agendar` (localStorage) aparecem na Agenda, no Dashboard
-  ("Chegando pelo site") e em Clientes, marcados com o selo "site".
-- **Para usar dados reais:** substitua as funções de `adminSeed.ts`; as telas leem tudo via `src/lib/analytics.ts`.
-- Comissões por barbeiro: `commissionRates` em `adminSeed.ts`.
+Este projeto é a base para cada barbearia nova. O que trocar, na ordem:
 
-## Como funciona a demonstração
+1. **Nome, endereço, telefone, WhatsApp e Instagram:** objeto `business` em `src/data/seed.ts`. O nome também aparece em
+   `index.html` (título e meta tags), `src/components/layout/Logo.tsx` e `src/hooks/usePageTitle.ts`.
+2. **Serviços e preços:** lista `services` em `seed.ts` (nome, descrição, preço, duração em minutos). Ajuste os pesos de
+   venda em `serviceWeights` (`adminSeed.ts`) para o painel refletir o mix do cliente.
+3. **Equipe:** lista `barbers` em `seed.ts` (nome, especialidade, folgas) e as comissões em `commissionRates` (`adminSeed.ts`).
+4. **Horário de funcionamento:** `weekHours` em `seed.ts` (a agenda e o "Aberto agora" se ajustam sozinhos).
+5. **Cores e fontes:** tokens no bloco `@theme` de `src/index.css` (`--color-gold-*` é o destaque; troque o dourado por
+   qualquer cor da marca e o site inteiro acompanha). Fontes: link do Google Fonts em `index.html` e `--font-display` / `--font-sans`.
+6. **Logo:** hoje é um ícone de tesoura + texto em `Logo.tsx` e `public/favicon.svg`. Para usar o logo do cliente,
+   coloque o arquivo em `public/` e troque o conteúdo de `Logo.tsx` por uma `<img>`.
+7. **Fotos:** IDs do Unsplash em `galleryIds` e `heroImage` (`seed.ts`, `lib/images.ts`). Troque pelas fotos reais do
+   cliente (coloque em `public/fotos/` e ajuste `Photo.tsx` para URLs locais). Avaliações em `reviews`.
+8. **Para usar com dados reais:** o painel lê tudo por `src/lib/analytics.ts`. Basta substituir as funções de
+   `adminSeed.ts` por dados de uma API.
 
-- **Agenda:** horários ocupados são gerados de forma determinística (clientes fictícios) e somados aos
-  agendamentos feitos por você, que ficam salvos em `localStorage` (chave `navalha:appointments:v1`).
-- **Pagamento:** PIX (QR e código falsos) e cartão (formulário falso). Nenhum valor é cobrado.
-- Para limpar os agendamentos: DevTools → Application → Local Storage → apagar a chave acima.
+> Dica: antes de apresentar a um cliente novo, rode `npm run build && npm run preview` e confira no celular.

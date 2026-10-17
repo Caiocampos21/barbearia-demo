@@ -1,3 +1,4 @@
+import { usePageTitle } from '../hooks/usePageTitle'
 import FinalCta from '../components/home/FinalCta'
 import Gallery from '../components/home/Gallery'
 import Hero from '../components/home/Hero'
@@ -9,6 +10,7 @@ import Stats from '../components/home/Stats'
 import Team from '../components/home/Team'
 
 export default function Home() {
+  usePageTitle()
   return (
     <>
       <Hero />

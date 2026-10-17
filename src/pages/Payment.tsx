@@ -1,3 +1,4 @@
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Check, Copy, CreditCard, Loader2, QrCode, ShieldCheck, Timer } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
@@ -13,6 +14,7 @@ import type { PaymentMethod } from '../lib/types'
 const PIX_SECONDS = 15 * 60
 
 export default function Payment() {
+  usePageTitle('Pagamento')
   const { id = '' } = useParams()
   const navigate = useNavigate()
   const [appt] = useState(() => getAppointment(id))

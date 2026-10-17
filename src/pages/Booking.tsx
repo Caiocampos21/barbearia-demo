@@ -1,3 +1,4 @@
+import { usePageTitle } from '../hooks/usePageTitle'
 import { ArrowLeft, ArrowRight, Loader2, ShieldCheck } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -36,6 +37,7 @@ interface Draft {
 }
 
 export default function Booking() {
+  usePageTitle('Agendar horário')
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const presetService = services.find((s) => s.id === params.get('servico'))?.id

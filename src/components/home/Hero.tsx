@@ -1,13 +1,17 @@
-import { ChevronDown, Star } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { business } from '../../data/seed'
+import { ChevronDown, Star, Zap } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { barbers, business, services } from '../../data/seed'
 import { getOpenStatus } from '../../lib/hours'
 import { heroImage } from '../../lib/images'
+import { nextFreeSlot } from '../../lib/schedule'
+import { loadAppointments } from '../../lib/storage'
 import { ButtonLink } from '../ui/Button'
 import Photo from '../ui/Photo'
 
 export default function Hero() {
   const [status, setStatus] = useState(getOpenStatus())
+  const next = useMemo(() => nextFreeSlot(barbers, services[0], loadAppointments()), [])
 
   useEffect(() => {
     const t = setInterval(() => setStatus(getOpenStatus()), 60_000)
@@ -16,9 +20,11 @@ export default function Hero() {
 
   return (
     <section className="relative flex min-h-dvh items-center overflow-hidden">
-      <Photo id={heroImage} alt="" width={1600} eager className="absolute inset-0 size-full" />
-      <div className="absolute inset-0 bg-gradient-to-b from-ink-950/80 via-ink-950/65 to-ink-950" />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink-950/90 via-transparent to-transparent" />
+      <div className="absolute inset-0 animate-kenburns" aria-hidden>
+        <Photo id={heroImage} alt="" width={1600} eager className="size-full" />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-ink-950/55 via-ink-950/30 to-ink-950" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink-950/85 via-ink-950/25 to-transparent" />
 
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-24 pt-32 sm:px-6">
         <div className="animate-fade-up inline-flex items-center gap-2 rounded-pill border border-white/10 bg-ink-950/60 px-4 py-2 text-xs backdrop-blur">
@@ -48,7 +54,18 @@ export default function Hero() {
           </ButtonLink>
         </div>
 
-        <div className="animate-fade-up mt-10 flex items-center gap-3 text-sm text-ink-200" style={{ animationDelay: '480ms' }}>
+        {next && (
+          <Link
+            to={`/agendar?servico=${services[0].id}`}
+            className="animate-fade-up mt-6 inline-flex items-center gap-2 rounded-pill border border-gold-500/40 bg-gold-500/10 px-4 py-2 text-sm text-gold-200 transition-colors hover:bg-gold-500/20"
+            style={{ animationDelay: '420ms' }}
+          >
+            <Zap className="size-4 text-gold-400" aria-hidden />
+            Próximo horário livre: <strong className="text-gold-300">{next.isToday ? 'hoje' : next.isTomorrow ? 'amanhã' : next.key.split('-').reverse().slice(0, 2).join('/')} às {next.time}</strong>
+          </Link>
+        )}
+
+        <div className="animate-fade-up mt-8 flex items-center gap-3 text-sm text-ink-200" style={{ animationDelay: '480ms' }}>
           <div className="flex text-gold-400" aria-hidden>
             {Array.from({ length: 5 }).map((_, i) => (
               <Star key={i} className="size-4 fill-current" />
