@@ -33,12 +33,15 @@ export const customers: Customer[] = Array.from({ length: CUSTOMER_COUNT }, (_, 
   const first = firstNames[(i * 13) % firstNames.length]
   const last = lastNames[(Math.floor(i / firstNames.length) * 5) % lastNames.length]
   const month = 1 + Math.floor(hash01(`bm${i}`) * 12)
-  const day = 1 + Math.floor(hash01(`bd${i}`) * 28)
-  const n = Math.floor(10000000 + hash01(`ph${i}`) * 89999999)
+  const daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1]
+  const day = 1 + Math.floor(hash01(`bd${i}`) * daysInMonth)
+  // celular de BH: DDD 31 + 9 + 8 dígitos. Um dígito por hash evita finais repetidos (a hash tem só 10 mil valores)
+  const digit = (k: number) => Math.floor(hash01(`ph${i}-${k}`) * 10)
+  const tail = Array.from({ length: 8 }, (_, k) => (k === 0 ? 6 + (digit(k) % 4) : digit(k))).join('')
   return {
     id: `c${String(i + 1).padStart(4, '0')}`,
     name: `${first} ${last}`,
-    phone: `(31) 9${String(n).slice(0, 4)}-${String(n).slice(4, 8)}`,
+    phone: `(31) 9${tail.slice(0, 4)}-${tail.slice(4)}`,
     birthday: `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
   }
 })
