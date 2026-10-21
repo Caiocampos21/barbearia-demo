@@ -4,6 +4,7 @@ Demo completa de um sistema para barbearias, feita para **mostrar a donos de bar
 
 - **Site do cliente** (`/`): landing premium, agendamento online em 5 passos e pagamento simulado (PIX e cartão) com comprovante.
 - **Painel do dono** (`/painel`): dashboard, agenda, financeiro, barbeiros, clientes e estoque, com gráficos.
+- **Área do barbeiro** (`/equipe`): feita para o celular. Cada barbeiro vê a própria agenda do dia e da semana, os ganhos (comissão, meta do mês) e os seus clientes.
 
 Tudo é **100% front-end** (sem backend). Os dados são fictícios e os agendamentos feitos no site ficam no `localStorage`
 do navegador, aparecendo também no painel. Em todas as telas há aviso de "ambiente de demonstração" e um botão
@@ -20,6 +21,8 @@ do navegador, aparecendo também no painel. Em todas as telas há aviso de "ambi
 | `/pagamento/:id` · `/comprovante/:id` | Pagamento simulado e comprovante |
 | `/painel` | Dashboard do dono |
 | `/painel/agenda` · `/financeiro` · `/barbeiros` · `/clientes` · `/estoque` | Demais seções do painel |
+| `/equipe` | Área do barbeiro: escolha quem você é (demo sem senha) e veja o dia |
+| `/equipe/semana` · `/ganhos` · `/clientes` | Semana, ganhos e clientes do barbeiro |
 
 ## Como rodar
 
@@ -71,11 +74,13 @@ src/
     admin/                                sidebar, KPIs, tooltips e tema dos gráficos
   pages/         Home, Booking, Payment, Receipt, NotFound
   pages/admin/   Dashboard, Agenda, Finance, Barbers, Customers, Stock
+  pages/barber/  BarberToday, BarberWeek, BarberEarnings, BarberClients
+  components/barber/  layout com menu inferior, escolha do barbeiro e linha de atendimento
   data/
     seed.ts       negócio, serviços, barbeiros, horários, avaliações, galeria
     adminSeed.ts  gerador dos dados do painel (atendimentos, clientes, despesas, estoque)
   lib/           agenda (schedule/grid), analytics (cálculos do painel), storage, formatação, tipos
-  hooks/         useInView, useAdminData, usePageTitle
+  hooks/         useInView, useAdminData, useBarber, usePageTitle
 ```
 
 ## Como funcionam os dados
@@ -83,6 +88,7 @@ src/
 - **Uma fonte única:** `adminSeed.ts` gera ~4 meses de histórico (≈ 600 clientes, ≈ 1.000 atendimentos/mês, preços
   reais de BH, mais movimento sexta e sábado) e agenda futura. O site e o painel usam a mesma base, então os horários batem.
 - Os dados são **determinísticos** e **relativos a "hoje"**: todo dia o mês atual aparece preenchido e igual para qualquer pessoa.
+- A área do barbeiro usa o mesmo conjunto de dados do painel (`lib/barberAnalytics.ts` só filtra por barbeiro), então a comissão que ele vê é a mesma que o dono vê. Na demo, quem está "logado" fica em `navalha:barber:v1` (sem senha); numa versão real, entra um login de verdade.
 - Agendamentos feitos em `/agendar` entram na Agenda, no Dashboard ("Chegando pelo site") e em Clientes, com selo "site".
 - No mês em andamento, as despesas fixas entram proporcionais aos dias decorridos (regime de competência).
 - **Resetar dados** (botão no painel e no selo no canto do site) apaga as chaves `navalha:*` do `localStorage` e recarrega.

@@ -62,6 +62,10 @@ export default function Footer() {
           <Link to="/painel" className="hover:text-gold-300">
             Painel do dono
           </Link>
+          {' · '}
+          <Link to="/equipe" className="hover:text-gold-300">
+            Área do barbeiro
+          </Link>
         </p>
       </div>
     </footer>
