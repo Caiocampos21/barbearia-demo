@@ -1,30 +1,1079 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0E0E10" />
-    <meta
-      name="description"
-      content="Barbearia Navalha de Ouro — corte, barba e experiência premium na Savassi, Belo Horizonte. Agende seu horário online."
-    />
-    <title>Barbearia Navalha de Ouro · Belo Horizonte</title>
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="pt_BR" />
-    <meta property="og:title" content="Barbearia Navalha de Ouro · Belo Horizonte" />
-    <meta property="og:description" content="Corte, barba e experiência premium na Savassi. Agende seu horário online em menos de um minuto." />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=1200&h=630&q=75" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="utf-8">
+<title>Barbearia NAVALHA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Barbearia em Lourdes, Belo Horizonte. Corte, barba, acabamento e sobrancelha com agendamento pelo WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="cut.jpg" fetchpriority="high">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600;700&display=swap">
+<script>
+  /* has-js: cabeçalho fixo e menu. motion: estados iniciais das animações (só sem "reduzir movimento").
+     Se o script principal não confirmar em 3s, motion sai e todo o conteúdo aparece. */
+  (function(h){
+    h.classList.add('has-js');
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    h.classList.add('motion');
+    setTimeout(function(){ if (!window.__navalhaReady) h.classList.remove('motion'); }, 3000);
+  })(document.documentElement);
+</script>
+<!--
+  PENDÊNCIAS — confirmar com o responsável antes de publicar (hoje é um projeto demonstrativo):
+  - WhatsApp/telefone: 5531990000000 / (31) 99000-0000 (definidos só em NAVALHA_CONFIG, no fim do arquivo)
+  - Endereço: Rua Pium-í, 540 — Lourdes, Belo Horizonte/MG
+  - Funcionamento: terça a sábado, 9h às 20h
+  - Preços, durações e descrições dos 5 serviços
+  - Envio da solicitação pelo site: Netlify Forms (form "agendamento"). Depois do deploy, ativar
+    "Form detection" e a notificação por e-mail no painel do Netlify e fazer um envio de teste.
+    As solicitações (nome e WhatsApp) ficam guardadas na conta Netlify do responsável.
+  - Legendas da galeria (da versão original): "Lourdes, BH", "Sua cadeira", "Ferramentas"
+  - Barbeiros: nomes, especialidades e fotos (portrait.jpg e portrait3.jpg parecem de banco de imagens, fundos diferentes)
+  - Fotos do espaço (shop.jpg, beard.jpg, razor.jpg): confirmar se mostram a barbearia real;
+    razor.jpg é uma foto de produto com marcas de terceiros visíveis no secador
+  - Título do hero "Seu próximo corte começa aqui." é provisório
+-->
+<style>
+  /* ================================================================
+     DIREÇÃO: capa de revista masculina. Fotografia protagonista, serifada monumental,
+     sobreposições intencionais, índice de seções (01–06) ligado por filetes.
+     Instrument Serif: títulos, nomes, números. Archivo: navegação, texto, preços, botões, etiquetas.
+     Vermelho: botões, índices, etiquetas e estados de interação.
+     ================================================================ */
+  :root{
+    --bg:#efe9dd; --bg-2:#e7e0d1;
+    --dark:#14100d; --ink:#1a1512;
+    --text:#1a1512; --text-2:#6b6359; --text-3:#4a423b;
+    --on-dark:#efe9dd; --on-dark-2:#b8ae9f;
+    --red:#a81f16; --red-dark:#8a1912;
+    --divider:#d5cdbf; --divider-dk:#3a332d;
+    --num:#cfc4b2;
+
+    --f-serif:"Instrument Serif",Georgia,serif;
+    --f-sans:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+
+    --fs-hero:clamp(76px,10vw,144px);
+    --fs-section:clamp(48px,5vw,72px);
+    --fs-feature:clamp(64px,8vw,112px);
+    --fs-close:clamp(64px,9vw,124px);
+    --fs-svc:clamp(28px,3.5vw,46px);
+    --fs-barber:clamp(34px,3.5vw,46px);
+    --fs-body:15px;
+    --fs-label:10px;
+
+    --ease:cubic-bezier(.22,1,.36,1);
+    --gutter:clamp(48px,5vw,80px);
+    --sy:140px;
+    --hh:88px;
+  }
+  @media (max-width:1023px){:root{--gutter:32px;--sy:96px}}
+  @media (max-width:759px){:root{--hh:72px}}
+  @media (max-width:600px){
+    :root{--gutter:22px;--sy:80px;--fs-hero:clamp(52px,13vw,76px);--fs-section:clamp(42px,11vw,56px);
+      --fs-feature:clamp(52px,13vw,72px);--fs-close:clamp(52px,13vw,72px);--fs-body:14px}
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  *{margin:0}
+  /* o atributo hidden precisa vencer display:grid/flex definidos nas classes */
+  [hidden]{display:none!important}
+  html{scroll-padding-top:88px;-webkit-text-size-adjust:100%}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+  body{background:var(--bg);color:var(--text);font-family:var(--f-sans);font-size:var(--fs-body);line-height:1.65;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  /* height:auto: senão o atributo height do HTML vence o aspect-ratio do CSS */
+  img{display:block;max-width:100%;height:auto}
+  a{color:inherit}
+  ul,ol{list-style:none;padding:0}
+  h1,h2,h3{font-weight:400}
+  :focus-visible{outline:2px solid var(--red);outline-offset:3px}
+  .on-dark :focus-visible{outline-color:var(--on-dark)}
+
+  .container{width:min(100% - 2 * var(--gutter),1320px);margin-inline:auto}
+  .section{padding-block:var(--sy)}
+  .label{display:inline-block;font-size:var(--fs-label);font-weight:600;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+  .on-dark .label{color:var(--on-dark-2)}
+  .title{font-family:var(--f-serif);font-size:var(--fs-section);line-height:.95;letter-spacing:-.01em}
+
+  /* cabeçalho de seção: filete + índice + etiqueta — liga as seções como páginas de revista */
+  .sec-head{margin-bottom:56px}
+  .sec-rule{height:1px;background:var(--text);transform-origin:left}
+  .on-dark .sec-rule{background:var(--divider-dk)}
+  .sec-meta{display:flex;align-items:baseline;gap:16px;padding-top:18px;margin-bottom:clamp(40px,6vw,88px)}
+  .sec-index{font-family:var(--f-serif);font-size:28px;line-height:1;color:var(--red)}
+
+  /* ===== BOTÕES ===== */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:2px;
+    background:var(--red);color:#fff;font:600 12px/1 var(--f-sans);letter-spacing:.1em;text-transform:uppercase;
+    text-decoration:none;white-space:nowrap;cursor:pointer;
+    transition:background-color .22s ease-out,transform .22s ease-out}
+  .btn:hover{background:var(--red-dark);transform:translateY(-2px)}
+  .btn:active{transform:translateY(0) scale(.985);transition-duration:.1s}
+  .btn-sm{min-height:44px;padding:0 20px}
+
+  /* ===== CABEÇALHO =====
+     Sem JS fica absoluto. Com JS: fixo e transparente no topo; após 40px fica claro, com filete, e baixa para 72px.
+     No desktop os links ficam sobre a foto da capa, por isso começam claros. */
+  .site-header{position:absolute;top:0;left:0;right:0;z-index:50;color:var(--text);border-bottom:1px solid transparent;
+    transition:background-color .28s var(--ease),border-color .28s var(--ease),color .28s var(--ease)}
+  .has-js .site-header{position:fixed}
+  .site-header.is-scrolled,.site-header.menu-open{background:var(--bg);border-bottom-color:var(--divider)}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;height:var(--hh);transition:height .28s var(--ease)}
+  .site-header.is-scrolled .header-inner{height:72px}
+  .brand{font-family:var(--f-serif);font-size:26px;line-height:1;letter-spacing:.14em;text-decoration:none}
+  .nav{display:flex;align-items:center;gap:32px}
+  .nav-links{display:flex;gap:28px}
+  .nav-links a{position:relative;display:flex;align-items:center;min-height:44px;font-size:12px;font-weight:500;line-height:1;
+    letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:color .18s ease}
+  .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:12px;height:1px;background:var(--red);
+    transform:scaleX(0);transform-origin:left;transition:transform .18s ease}
+  .nav-links a:hover{color:var(--red);transition-duration:.22s}
+  .nav-links a:hover::after{transform:scaleX(1);transition-duration:.22s}
+  @media (min-width:1024px){
+    .site-header:not(.is-scrolled) .nav-links a{color:var(--on-dark)}
+    .site-header:not(.is-scrolled) .nav-links a:hover{color:#fff}
+    .site-header:not(.is-scrolled) .nav-links a::after{background:var(--on-dark)}
+    .site-header:not(.is-scrolled) .nav :focus-visible{outline-color:var(--on-dark)}
+  }
+  .menu-toggle{display:none;position:relative;width:44px;height:44px;padding:0;border:0;background:none;color:inherit;cursor:pointer}
+  .menu-toggle span{position:absolute;left:11px;right:11px;height:1.5px;background:currentColor;transition:transform .22s var(--ease)}
+  .menu-toggle span:nth-child(1){top:18px}
+  .menu-toggle span:nth-child(2){top:25px}
+  .menu-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(3.5px) rotate(45deg)}
+  .menu-toggle[aria-expanded="true"] span:nth-child(2){transform:translateY(-3.5px) rotate(-45deg)}
+  @media (max-width:759px){
+    .brand{font-size:22px}
+    .nav{gap:8px}
+    .has-js .menu-toggle{display:block}
+    /* painel abaixo do cabeçalho: visibility tira os links da tabulação quando fechado */
+    .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;padding:8px var(--gutter) 24px;
+      background:var(--bg);border-bottom:1px solid var(--divider);visibility:hidden;opacity:0;
+      transition:opacity .22s ease,visibility 0s linear .22s}
+    .menu-open .nav-links{visibility:visible;opacity:1;transition:opacity .22s ease}
+    .nav-links li{opacity:0;transform:translateY(8px);transition:opacity .3s var(--ease),transform .3s var(--ease)}
+    .menu-open .nav-links li{opacity:1;transform:none;transition-delay:calc(var(--i,0) * 45ms)}
+    .nav-links a{min-height:52px;font-size:14px}
+    .nav-links a::after{bottom:14px;right:auto;width:100%}
+  }
+
+  /* ================================================================
+     HERO — capa editorial. Camadas: fundo · 01 · fotografia · título · apoio · CTA
+     --split = onde a foto começa (% da largura). O título tem duas cópias idênticas:
+     a escura é recortada até a borda da foto, a clara a partir dela — a cor troca exatamente na borda.
+     ================================================================ */
+  .hero{position:relative;container-type:inline-size;background:var(--bg);overflow:hidden;--split:34}
+  .hero-photo{position:relative;z-index:2;overflow:hidden;background:var(--ink)}
+  .hero-photo img{width:100%;height:100%;object-fit:cover}
+  .hero-num{position:absolute;z-index:1;font-family:var(--f-serif);line-height:.8;letter-spacing:-.04em;color:var(--num);
+    opacity:.5;pointer-events:none;user-select:none}
+  .hero-head{position:relative;z-index:3}
+  .hero-title{font-family:var(--f-serif);font-size:var(--fs-hero);line-height:.82;letter-spacing:-.02em}
+  .hero-title .t{display:block}
+  .hero-title .t-light{display:none}
+  .hero-title .line{display:block}
+  .hero-title .w{display:inline-block}
+  .hero-head .label{margin-bottom:28px}
+  .hero-aside{position:relative;z-index:3}
+  .hero-text{max-width:360px;font-size:15px;line-height:1.65;color:var(--text-3)}
+  .hero .btn{margin-top:30px}
+  .hero-info{max-width:360px;margin-top:28px;padding-top:16px;border-top:1px solid var(--divider);font-size:12px;line-height:1.5;color:var(--text-2)}
+
+  @media (min-width:1024px){
+    .hero{display:grid;grid-template-columns:calc(var(--split) * 1%) 1fr;grid-template-rows:1fr auto;min-height:max(88vh,720px);min-height:max(88svh,720px);
+      --pl:max(var(--gutter),calc((100cqw - 1320px) / 2))}
+    .hero-photo{grid-column:2;grid-row:1/-1}
+    /* foto alinhada à esquerda (x 0%): o título cobre só a camisa escura do barbeiro; rosto e tesoura ficam livres */
+    .hero-photo img{position:absolute;inset:0;object-position:0% 50%}
+    .hero-num{left:calc(var(--split) * 1cqw - .58em);top:calc(var(--hh) - .04em);font-size:clamp(260px,31vw,460px)}
+    .hero-head{grid-column:1;grid-row:1;align-self:end;padding:calc(var(--hh) + 32px) 0 0 var(--pl);
+      width:calc(100cqw - var(--pl))}
+    .hero-title{position:relative;white-space:nowrap}
+    .hero-title .t-dark{clip-path:inset(0 calc(100% - (var(--split) * 1cqw - var(--pl))) 0 0)}
+    .hero-title .t-light{display:block;position:absolute;inset:0;color:var(--on-dark);
+      clip-path:inset(0 0 0 calc(var(--split) * 1cqw - var(--pl)))}
+    .hero-aside{grid-column:1;grid-row:2;padding:40px 32px clamp(48px,7vh,80px) var(--pl)}
+  }
+  /* foto mais estreita: desloca o enquadramento para o rosto não encostar na borda direita */
+  @media (min-width:1024px) and (max-width:1199px){.hero{--split:38}.hero-photo img{object-position:30% 50%}}
+  @media (max-width:1023px){
+    /* empilhado: título sobre fundo claro, imediatamente acima da foto */
+    .hero{display:flex;flex-direction:column;padding-top:calc(var(--hh) + 24px)}
+    .hero-head{order:1}
+    .hero-photo{order:2}
+    .hero-aside{order:3}
+    .hero-num{top:calc(var(--hh) - 12px);right:-.06em;font-size:clamp(150px,34vw,260px)}
+    .hero-head{padding-inline:var(--gutter);padding-bottom:28px}
+    .hero-title .line{display:inline}
+    .hero-photo{aspect-ratio:3/2}
+    .hero-photo img{object-position:50% 50%}
+    .hero-aside{padding:32px var(--gutter) 56px}
+  }
+  @media (max-width:600px){.hero-photo{aspect-ratio:5/4}.hero-photo img{object-position:52% 50%}.hero-text{font-size:14px}}
+
+  /* ===== SERVIÇOS — seleção única =====
+     Cada linha é um <label> com um radio nativo: teclado (setas), leitor de tela e toque funcionam sem código extra.
+     Hover = sugestão (6px, fundo .045). Selecionado = escolha (8px, fundo .075, número e marcador vermelhos). */
+  .services{padding-top:clamp(56px,7vw,96px)}
+  .sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .svc-group{min-width:0;margin:0;padding:0;border:0}
+  .svc-list{border-top:1px solid var(--divider)}
+  .svc{position:relative;display:block;margin-inline:-14px;padding-inline:14px;overflow:hidden;border-bottom:1px solid var(--divider);
+    cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .svc::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--red);
+    transform:scaleX(0);transform-origin:left;transition:transform .3s var(--ease)}
+  .svc-inner{display:grid;grid-template-columns:64px minmax(0,1fr) 110px 32px;grid-template-areas:"num main price arrow";
+    align-items:center;column-gap:24px;padding-block:30px}
+  .svc-num{grid-area:num;font-family:var(--f-serif);font-size:22px;line-height:1;color:var(--text-2)}
+  .svc-main{grid-area:main;display:grid;grid-template-columns:14px minmax(0,1fr);column-gap:16px;align-items:center}
+  /* marcador: anel vazio (selecionável) → círculo vermelho com ponto claro (selecionado) */
+  .svc-dot{position:relative;width:14px;height:14px;border:1px solid #b3a896;border-radius:50%}
+  .svc-dot::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--bg);transform:scale(0)}
+  .svc-name{grid-column:2;font-family:var(--f-serif);font-size:var(--fs-svc);line-height:1;letter-spacing:-.01em;color:var(--text)}
+  .svc-desc{grid-column:2;margin-top:10px;font-size:13px;line-height:1.5;color:var(--text-2)}
+  .svc-time{font-weight:600;color:var(--text-3);font-variant-numeric:tabular-nums}
+  .svc-price{grid-area:price;justify-self:end;font-size:18px;font-weight:600;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .svc-arrow{grid-area:arrow;justify-self:end;font-size:18px;line-height:1;color:var(--text-2)}
+  /* propriedades específicas, nunca "all" (a entrada em grupo fica no <li>, separada destas) */
+  .svc{transition:background-color .28s var(--ease),border-color .28s var(--ease)}
+  .svc-inner{transition:transform .28s var(--ease)}
+  .svc-num,.svc-name,.svc-price,.svc-arrow{transition:color .28s var(--ease)}
+  .svc-arrow{transition:color .28s var(--ease),transform .28s var(--ease)}
+  .svc-dot{transition:background-color .28s var(--ease),border-color .28s var(--ease)}
+  .svc-dot::after{transition:transform .28s var(--ease)}
+  @media (hover:hover){
+    .svc:hover{background-color:rgba(168,31,22,.045)}
+    .svc:hover::after{transform:scaleX(1)}
+    .svc:hover .svc-inner{transform:translateX(6px)}
+    .svc:hover .svc-price,.svc:hover .svc-arrow{color:var(--red)}
+    .svc:hover .svc-arrow{transform:translateX(4px)}
+    .svc:hover .svc-dot{border-color:var(--red)}
+  }
+  /* selecionado (classe do JS + :has como reserva sem JS) */
+  .svc.is-selected,.svc:has(input:checked){background-color:rgba(168,31,22,.075)}
+  .svc.is-selected::after,.svc:has(input:checked)::after{transform:scaleX(1)}
+  .svc.is-selected .svc-inner,.svc:has(input:checked) .svc-inner{transform:translateX(8px)}
+  .svc.is-selected .svc-num,.svc:has(input:checked) .svc-num,
+  .svc.is-selected .svc-price,.svc:has(input:checked) .svc-price,
+  .svc.is-selected .svc-arrow,.svc:has(input:checked) .svc-arrow{color:var(--red)}
+  .svc.is-selected .svc-dot,.svc:has(input:checked) .svc-dot{background:var(--red);border-color:var(--red)}
+  .svc.is-selected .svc-dot::after,.svc:has(input:checked) .svc-dot::after{transform:scale(1)}
+  /* com uma opção escolhida, as outras recuam um tom: o nome escolhido ganha contraste */
+  .svc-list.has-selection .svc:not(.is-selected) .svc-name{color:var(--text-3)}
+  .svc:has(input:focus-visible){outline:2px solid var(--red);outline-offset:-2px}
+  .svc:active .svc-inner{transform:translateX(8px) scale(.99);transition-duration:.1s}
+
+  /* resumo da escolha + botão que abre o formulário */
+  .svc-summary{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 40px;padding-top:32px}
+  .svc-summary .label{display:block;margin-bottom:8px}
+  .sum-name{font-family:var(--f-serif);font-size:clamp(28px,3vw,38px);line-height:1}
+  .sum-meta{display:block;margin-top:8px;font-size:13px;color:var(--text-2);font-variant-numeric:tabular-nums}
+  .btn[disabled]{background:#cfc6b6;color:#3d362f;cursor:not-allowed;transform:none}
+
+  @media (max-width:600px){
+    .svc-inner{grid-template-columns:32px minmax(0,1fr) auto;grid-template-areas:"num main price";column-gap:12px;padding-block:24px;align-items:start}
+    .svc-main{grid-template-columns:12px minmax(0,1fr);column-gap:12px}
+    .svc-dot{width:12px;height:12px;margin-top:8px;align-self:start}
+    .svc-num{padding-top:6px;font-size:18px}
+    .svc-price{padding-top:6px}
+    .svc-arrow{display:none}
+    .svc-summary .btn{width:100%}
+  }
+
+  /* ===== SOLICITAR HORÁRIO — formulário editorial (sem cards) ===== */
+  .booking{padding-block:clamp(48px,6vw,96px) var(--sy)}
+  .booking-inner{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:clamp(40px,6vw,104px);align-items:start}
+  .booking .sec-meta{margin-bottom:28px}
+  .booking-title{font-family:var(--f-serif);font-size:clamp(42px,5vw,64px);line-height:.95;letter-spacing:-.01em}
+  .booking-title:focus{outline:none}
+  .booking-lead{max-width:46ch;margin-top:18px;color:var(--text-2)}
+  .booking-form{display:grid;gap:30px;margin-top:44px}
+  .field{display:grid;gap:6px;min-width:0}
+  .field label,.review-list dt,.aside-list dt{font-size:var(--fs-label);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-2)}
+  .field input,.field select,.field textarea{width:100%;min-height:46px;padding:10px 0;border:0;border-bottom:1px solid #b3a896;border-radius:0;
+    background:transparent;color:var(--text);font:400 16px/1.4 var(--f-sans);color-scheme:light;
+    transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+  .field select{appearance:none;-webkit-appearance:none;padding-right:28px;cursor:pointer}
+  .field textarea{min-height:92px;resize:vertical}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-bottom-color:var(--red);box-shadow:0 1px 0 var(--red)}
+  .field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{outline:none}
+  .select-wrap{position:relative}
+  .select-wrap::after{content:"";position:absolute;right:4px;top:50%;width:7px;height:7px;margin-top:-6px;border-right:1.5px solid var(--text);
+    border-bottom:1.5px solid var(--text);transform:rotate(45deg);pointer-events:none}
+  .field.has-error input,.field.has-error select{border-bottom-color:var(--red)}
+  .field-error{font-size:13px;line-height:1.4;color:var(--red)}
+  .field-error:empty{display:none}
+  .field-hint{font-size:12px;line-height:1.4;color:var(--text-2)}
+  .field-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}
+  .form-actions{display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px;margin-top:6px}
+  .link-btn{min-height:44px;padding:0;border:0;background:none;color:var(--text);font:600 12px/1 var(--f-sans);letter-spacing:.1em;
+    text-transform:uppercase;text-decoration:underline;text-underline-offset:6px;cursor:pointer;transition:color .2s var(--ease)}
+  .link-btn:hover{color:var(--red)}
+  .btn-outline{background:transparent;color:inherit;box-shadow:inset 0 0 0 1px currentColor}
+  .btn-outline:hover{background:var(--on-dark);color:var(--ink)}
+
+  .booking-review{margin-top:44px}
+  .review-title{font-family:var(--f-serif);font-size:clamp(30px,3vw,40px);line-height:1}
+  .review-list,.aside-list{margin-top:20px;border-top:1px solid var(--divider)}
+  .review-list>div,.aside-list>div{display:flex;justify-content:space-between;gap:24px;padding-block:14px;border-bottom:1px solid var(--divider)}
+  .review-list dd,.aside-list dd{margin:0;text-align:right;font-size:15px;font-variant-numeric:tabular-nums}
+  .review-note{max-width:52ch;margin-block:24px;padding-left:16px;border-left:2px solid var(--red);font-size:14px;line-height:1.6;color:var(--text-3)}
+  .booking-result{margin-top:16px;font-size:14px;color:var(--text-3)}
+  .booking-result:empty{display:none}
+
+  .booking-aside{position:sticky;top:104px;padding-top:22px;border-top:1px solid var(--text)}
+  .aside-name{margin-top:14px;font-family:var(--f-serif);font-size:clamp(30px,3vw,40px);line-height:1}
+  .aside-note{margin-top:18px;font-size:13px;line-height:1.5;color:var(--text-2)}
+
+  @media (max-width:900px){
+    .booking-inner{grid-template-columns:1fr}
+    .booking-aside{position:static}
+  }
+  @media (max-width:600px){
+    .field-row{grid-template-columns:1fr}
+    .form-actions .btn{width:100%}
+  }
+
+  /* ===== COMO FUNCIONA — matéria fotográfica escura ===== */
+  .feature{display:grid;grid-template-columns:1fr 1fr;background:var(--dark);color:var(--on-dark)}
+  .feature-media{position:relative;min-height:620px;overflow:hidden}
+  /* recorte da foto vertical: mãos, pente e orelha ficam entre 20% e 70% da altura */
+  .feature-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%}
+  .feature-body{padding:var(--sy) clamp(32px,6vw,112px)}
+  .feature .sec-meta{margin-bottom:clamp(32px,4vw,56px)}
+  .feature-title{font-family:var(--f-serif);font-size:var(--fs-feature);line-height:.88;letter-spacing:-.015em}
+  .steps{margin-top:48px;border-top:1px solid var(--divider-dk)}
+  .step{display:grid;grid-template-columns:64px minmax(0,1fr);column-gap:16px;padding-block:22px;border-bottom:1px solid var(--divider-dk)}
+  .step-num{grid-row:span 2;font-family:var(--f-serif);font-size:42px;line-height:.9;color:var(--red)}
+  .step-title{font-size:15px;font-weight:600;line-height:1.4}
+  .step-text{margin-top:4px;font-size:14px;line-height:1.75;color:var(--on-dark-2)}
+  .feature .btn{margin-top:40px}
+  /* se uma foto falhar: fundo intencional + caminho do arquivo, em vez de uma área vazia sem explicação */
+  .img-failed{background:#22201c}
+  .img-failed img{visibility:hidden}
+  .img-failed::before{content:"Imagem não carregada: " attr(data-img-error);position:absolute;left:24px;bottom:24px;z-index:3;
+    font-size:12px;letter-spacing:.04em;color:var(--on-dark-2)}
+  @media (max-width:900px){
+    .feature{grid-template-columns:1fr}
+    .feature-media{min-height:0;aspect-ratio:4/3}
+  }
+
+  /* ===== A BARBEARIA — ensaio fotográfico em 12 colunas ===== */
+  .essay-head{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(32px,5vw,80px);align-items:end}
+  .essay-text{max-width:440px;font-size:var(--fs-body);line-height:1.75;color:var(--text-2)}
+  .essay-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:clamp(130px,13.5vw,200px);gap:12px;margin-top:56px}
+  .g-item{position:relative;margin:0;overflow:hidden;background:var(--ink)}
+  .g-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
+  /* película só na base, para a legenda */
+  .g-item::after{content:"";position:absolute;left:0;right:0;bottom:0;height:45%;pointer-events:none;
+    background:linear-gradient(to top,rgba(20,16,13,.5),rgba(20,16,13,0))}
+  .g-item figcaption{position:absolute;left:18px;bottom:16px;z-index:1;color:var(--on-dark);font-size:10px;font-weight:600;
+    letter-spacing:.14em;text-transform:uppercase;opacity:.75;transition:opacity .22s var(--ease),transform .22s var(--ease)}
+  .g-main{grid-column:1/9;grid-row:1/4}
+  .g-main img{object-position:50% 60%}
+  .g-chair{grid-column:9/13;grid-row:1/3}
+  .g-chair img{object-position:50% 35%}
+  .g-tools{grid-column:9/13;grid-row:3/4}
+  .g-tools img{object-position:55% 55%}
+  @media (hover:hover){
+    .g-item:hover img{transform:scale(1.04)}
+    .g-item:hover figcaption{opacity:1;transform:translateY(-5px)}
+  }
+  @media (max-width:900px){
+    .essay-head{grid-template-columns:1fr}
+    .essay-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:auto;gap:10px;margin-top:40px}
+    .g-main{grid-column:1/-1;grid-row:auto;aspect-ratio:3/2}
+    .g-chair,.g-tools{grid-column:auto;grid-row:auto;aspect-ratio:4/5}
+  }
+  @media (max-width:480px){
+    .essay-grid{grid-template-columns:1fr}
+    .g-chair,.g-tools{aspect-ratio:3/2}
+  }
+
+  /* ===== BARBEIROS — retratos editoriais ===== */
+  .team{background:var(--bg-2)}
+  .team-inner{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,9fr);gap:clamp(40px,5vw,80px);align-items:end}
+  .team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;align-items:end}
+  .barber-photo{overflow:hidden}
+  .barber-photo img{width:100%;aspect-ratio:4/5;object-fit:cover;transition:transform .4s var(--ease)}
+  @media (hover:hover){.barber:hover .barber-photo img{transform:scale(1.025)}}
+  .barber-body{padding-top:22px;border-bottom:1px solid var(--divider);padding-bottom:18px}
+  .barber-name{font-family:var(--f-serif);font-size:var(--fs-barber);line-height:1}
+  .barber-role{display:block;margin-top:12px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-2)}
+  .barber-rafael img{object-position:50% 30%}
+  .barber-diego img{object-position:50% 18%}
+  .team .sec-head{margin-bottom:0}
+  @media (max-width:900px){.team-inner{grid-template-columns:1fr;gap:48px}}
+  @media (max-width:600px){.team-grid{grid-template-columns:1fr;gap:48px}}
+
+  /* ===== AGENDAMENTO — contracapa ===== */
+  .contact{background:var(--ink);color:var(--on-dark)}
+  .close-title{font-family:var(--f-serif);font-size:var(--fs-close);line-height:.88;letter-spacing:-.02em}
+  .close-title .line{display:block}
+  .close-row{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));gap:32px;margin-top:clamp(56px,7vw,96px)}
+  .close-row>div{padding-top:22px;border-top:1px solid var(--divider-dk)}
+  .close-row dt{font-size:var(--fs-label);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--on-dark-2)}
+  .close-row dd{margin-top:10px;font-size:15px;line-height:1.6}
+  .contact-note{max-width:30ch;margin-top:16px;font-size:13px;line-height:1.5;color:var(--on-dark-2)}
+  .phone{font-variant-numeric:tabular-nums}
+  @media (max-width:1023px){.close-row{grid-template-columns:repeat(3,minmax(0,1fr))}.close-row>.close-cta{grid-column:1/-1}}
+  @media (max-width:600px){.close-row{grid-template-columns:1fr;gap:0}.close-row>div{padding-block:20px}.close-title .line{display:inline}}
+
+  /* ===== RODAPÉ ===== */
+  .site-footer{background:var(--dark);color:var(--on-dark-2);font-size:11px;line-height:1.5;border-top:1px solid var(--divider-dk)}
+  .footer-inner{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 32px;padding-block:24px}
+  .footer-brand{font-family:var(--f-serif);font-size:18px;letter-spacing:.14em;color:var(--on-dark)}
+  @media (max-width:600px){.footer-inner{flex-direction:column;align-items:flex-start}}
+
+  /* ================================================================
+     ANIMAÇÕES — estados iniciais só existem com html.motion.
+     .rv blocos · .foc títulos (blur → nítido) · .in grupos com stagger · .rv-line filetes · .reveal-clip fotos
+     O IntersectionObserver adiciona .is-visible uma única vez. --delay coordena blocos em sequência.
+     ================================================================ */
+  .rv{transition:opacity .75s var(--ease) var(--delay,0s),transform .75s var(--ease) var(--delay,0s)}
+  .motion .rv:not(.is-visible){opacity:0;transform:translateY(24px)}
+
+  .foc{transition:opacity .85s var(--ease) var(--delay,80ms),filter .85s var(--ease) var(--delay,80ms),transform .85s var(--ease) var(--delay,80ms)}
+  .motion .foc:not(.is-visible){opacity:0;filter:blur(10px);transform:translateY(18px)}
+
+  .in>*{--rd:calc(var(--delay,0s) + min(calc(var(--i,0) * var(--stagger,70ms)),350ms));
+    transition:opacity var(--dur,.6s) var(--ease) var(--rd),transform var(--dur,.6s) var(--ease) var(--rd)}
+  .motion .in:not(.is-visible)>*{opacity:0;transform:translateY(var(--shift,18px))}
+
+  .rv-line{transition:transform .9s var(--ease)}
+  .motion .rv-line:not(.is-visible){transform:scaleX(0)}
+
+  /* fotos: recorte da esquerda para a direita + leve zoom de entrada ("to" explícito para interpolar) */
+  .reveal-clip{clip-path:inset(0 0 0 0);transition:clip-path 1s var(--ease)}
+  .reveal-clip img{transition:transform 1.4s var(--ease)}
+  .motion .reveal-clip:not(.is-visible){clip-path:inset(0 100% 0 0)}
+  .motion .reveal-clip:not(.is-visible) img{transform:scale(1.06)}
+
+  .barber-photo,.barber-body{--bd:calc(var(--i,0) * 100ms)}
+  .barber-photo{transition:opacity .65s var(--ease) var(--bd)}
+  .barber-body{transition:opacity .65s var(--ease) var(--bd),transform .65s var(--ease) var(--bd)}
+  .motion .team-grid:not(.is-visible) .barber-photo{opacity:0}
+  .motion .team-grid:not(.is-visible) .barber-body{opacity:0;transform:translateY(16px)}
+
+  /* hero: foto 0ms · 01 150ms · título 250/370/490ms por linha · apoio 700ms · CTA 950ms · info 1050ms */
+  .hero-photo{clip-path:inset(0 0 0 0);transition:clip-path 1s var(--ease)}
+  .hero-photo img{transition:transform 1.4s var(--ease)}
+  .hero-num{transition:opacity 1.1s var(--ease) .15s}
+  .hero-head .label{transition:opacity .7s var(--ease) .2s}
+  .hero-title .w{transition:opacity .9s var(--ease) var(--d,250ms),filter .9s var(--ease) var(--d,250ms),transform .9s var(--ease) var(--d,250ms)}
+  .hero-text{transition:opacity .65s var(--ease) .7s,transform .65s var(--ease) .7s}
+  .hero-info{transition:opacity .6s var(--ease) 1.05s,transform .6s var(--ease) 1.05s}
+  .motion .hero:not(.is-in) .hero-photo{clip-path:inset(0 100% 0 0)}
+  .motion .hero:not(.is-in) .hero-photo img{transform:scale(1.06)}
+  .motion .hero:not(.is-in) .hero-num{opacity:0}
+  .motion .hero:not(.is-in) .hero-head .label{opacity:0}
+  .motion .hero:not(.is-in) .hero-title .w{opacity:0;filter:blur(10px);transform:translateY(24px)}
+  .motion .hero:not(.is-in) .hero-text,.motion .hero:not(.is-in) .hero-info,.motion .hero:not(.is-in) .btn{opacity:0;transform:translateY(12px)}
+  /* atraso da entrada do CTA só durante a entrada, para não atrasar o hover depois */
+  .motion .hero.is-entering .btn{transition:opacity .6s var(--ease) .95s,transform .6s var(--ease) .95s}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.01ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+    .btn:hover,.svc:hover .svc-inner,.svc:focus-within .svc-inner,.g-item:hover img,.g-item:hover figcaption,
+    .barber:hover .barber-photo img{transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="top-sentinel" aria-hidden="true" style="position:absolute;top:0;left:0;width:1px;height:40px;pointer-events:none"></div>
+
+<!-- Botões com data-wa recebem o link do WhatsApp via NAVALHA_CONFIG; sem JS levam ao #contato -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="#topo">NAVALHA</a>
+    <nav class="nav" aria-label="Principal">
+      <ul class="nav-links" id="menu">
+        <li style="--i:0"><a href="#servicos">Serviços</a></li>
+        <li style="--i:1"><a href="#barbearia">A barbearia</a></li>
+        <li style="--i:2"><a href="#contato">Contato</a></li>
+      </ul>
+      <a class="btn btn-sm" href="#servicos">Agendar</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu"><span></span><span></span></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- 01 — CAPA -->
+<section class="hero" id="topo">
+  <span class="hero-num" aria-hidden="true">01</span>
+  <div class="hero-photo">
+    <img src="cut.jpg" alt="Barbeiro aparando a barba de um cliente com tesoura" width="1400" height="933" fetchpriority="high">
+  </div>
+  <div class="hero-head">
+    <span class="label">Barbearia · Lourdes, Belo Horizonte</span>
+    <!-- título provisório: trocar quando houver frase aprovada. A cópia clara é só visual (aria-hidden). -->
+    <h1 class="hero-title">
+      <span class="t t-dark"><span class="line"><span class="w">Seu</span> <span class="w">próximo</span></span> <span class="line"><span class="w">corte</span> <span class="w">começa</span></span> <span class="line"><span class="w">aqui.</span></span></span>
+      <span class="t t-light" aria-hidden="true"><span class="line"><span class="w">Seu</span> <span class="w">próximo</span></span> <span class="line"><span class="w">corte</span> <span class="w">começa</span></span> <span class="line"><span class="w">aqui.</span></span></span>
+    </h1>
+  </div>
+  <div class="hero-aside">
+    <p class="hero-text">Corte, barba, acabamento e sobrancelha com hora marcada. Escolha o serviço, peça o horário pelo site e a barbearia confirma pelo WhatsApp.</p>
+    <a class="btn" href="#servicos">Agendar horário</a>
+    <p class="hero-info">Terça a sábado, 9h às 20h</p>
+  </div>
+</section>
+
+<!-- 02 — SERVIÇOS -->
+<section class="section services" id="servicos">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-rule rv-line"></div>
+      <div class="sec-meta rv"><span class="sec-index">02</span><span class="label">Serviços</span></div>
+      <h2 class="title foc" id="servicos-title">Serviços e preços</h2>
+    </div>
+    <!-- preços, durações e descrições: pendentes de validação. Os data-* de cada opção são a única fonte
+         dos dados usados no resumo, no formulário e na mensagem do WhatsApp. -->
+    <fieldset class="svc-group">
+      <legend class="sr-only">Escolha um serviço</legend>
+      <ul class="svc-list in">
+        <li><label class="svc"><input class="sr-only" type="radio" name="servico" value="corte" data-nome="Corte" data-preco="R$ 45" data-duracao="40" data-duracao-label="40 min"><span class="svc-inner">
+          <span class="svc-num" aria-hidden="true">01</span>
+          <span class="svc-main"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">Corte</span><span class="svc-desc">Tesoura e máquina, com lavagem e finalização · <span class="svc-time">40 min</span></span></span>
+          <span class="svc-price">R$ 45</span><span class="svc-arrow" aria-hidden="true">→</span>
+        </span></label></li>
+        <li><label class="svc"><input class="sr-only" type="radio" name="servico" value="barba" data-nome="Barba" data-preco="R$ 35" data-duracao="30" data-duracao-label="30 min"><span class="svc-inner">
+          <span class="svc-num" aria-hidden="true">02</span>
+          <span class="svc-main"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">Barba</span><span class="svc-desc">Toalha quente, navalha e óleo · <span class="svc-time">30 min</span></span></span>
+          <span class="svc-price">R$ 35</span><span class="svc-arrow" aria-hidden="true">→</span>
+        </span></label></li>
+        <li><label class="svc"><input class="sr-only" type="radio" name="servico" value="corte-barba" data-nome="Corte + Barba" data-preco="R$ 70" data-duracao="70" data-duracao-label="1h10"><span class="svc-inner">
+          <span class="svc-num" aria-hidden="true">03</span>
+          <span class="svc-main"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">Corte + Barba</span><span class="svc-desc">Os dois serviços no mesmo atendimento · <span class="svc-time">1h10</span></span></span>
+          <span class="svc-price">R$ 70</span><span class="svc-arrow" aria-hidden="true">→</span>
+        </span></label></li>
+        <li><label class="svc"><input class="sr-only" type="radio" name="servico" value="acabamento" data-nome="Acabamento" data-preco="R$ 20" data-duracao="15" data-duracao-label="15 min"><span class="svc-inner">
+          <span class="svc-num" aria-hidden="true">04</span>
+          <span class="svc-main"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">Acabamento</span><span class="svc-desc">Pezinho e contorno entre um corte e outro · <span class="svc-time">15 min</span></span></span>
+          <span class="svc-price">R$ 20</span><span class="svc-arrow" aria-hidden="true">→</span>
+        </span></label></li>
+        <li><label class="svc"><input class="sr-only" type="radio" name="servico" value="sobrancelha" data-nome="Sobrancelha" data-preco="R$ 15" data-duracao="10" data-duracao-label="10 min"><span class="svc-inner">
+          <span class="svc-num" aria-hidden="true">05</span>
+          <span class="svc-main"><span class="svc-dot" aria-hidden="true"></span><span class="svc-name">Sobrancelha</span><span class="svc-desc">Alinhamento na navalha · <span class="svc-time">10 min</span></span></span>
+          <span class="svc-price">R$ 15</span><span class="svc-arrow" aria-hidden="true">→</span>
+        </span></label></li>
+      </ul>
+    </fieldset>
+    <div class="svc-summary">
+      <p aria-live="polite"><span class="label">Serviço escolhido</span><span class="sum-name" data-sum-name>Nenhum serviço</span><span class="sum-meta" data-sum-meta>Selecione uma opção na lista.</span></p>
+      <button class="btn" type="button" data-open-booking disabled>Agendar</button>
+    </div>
+  </div>
+</section>
+
+<!-- SOLICITAR HORÁRIO — aberto pelo botão "Agendar". Fica oculto sem JS (o envio depende de JS e
+     um formulário sem destino colocaria dados pessoais na URL). -->
+<section class="booking" id="agendar" aria-labelledby="booking-title" hidden>
+  <div class="container booking-inner">
+    <div class="booking-main">
+      <div class="sec-rule rv-line"></div>
+      <div class="sec-meta"><span class="label">Agendamento</span></div>
+      <h2 class="booking-title" id="booking-title" tabindex="-1">Solicitar horário</h2>
+      <p class="booking-lead">Preencha os dados abaixo. A barbearia confirma a disponibilidade pelo WhatsApp.</p>
+
+      <!-- Netlify Forms: o robô do deploy lê este <form> e cadastra os campos pelo atributo name.
+           preco e duracao vão em campos ocultos porque campo fora do HTML é descartado pelo Netlify.
+           bot-field é uma armadilha anti-spam: pessoas não veem; robôs preenchem e o envio é ignorado. -->
+      <form class="booking-form" name="agendamento" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+        <input type="hidden" name="form-name" value="agendamento">
+        <input type="hidden" name="preco">
+        <input type="hidden" name="duracao">
+        <p class="sr-only" aria-hidden="true"><label>Não preencha este campo <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <div class="field">
+          <label for="f-servico">Serviço</label>
+          <div class="select-wrap"><select id="f-servico" name="servico" aria-describedby="e-servico"></select></div>
+          <p class="field-error" id="e-servico"></p>
+        </div>
+        <div class="field">
+          <label for="f-nome">Nome</label>
+          <input id="f-nome" name="nome" type="text" autocomplete="name" aria-describedby="e-nome">
+          <p class="field-error" id="e-nome"></p>
+        </div>
+        <div class="field">
+          <label for="f-whats">WhatsApp para contato</label>
+          <input id="f-whats" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" aria-describedby="h-whats e-whats">
+          <p class="field-hint" id="h-whats">Com DDD, por exemplo (31) 99999-9999.</p>
+          <p class="field-error" id="e-whats"></p>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="f-data">Data desejada</label>
+            <input id="f-data" name="data" type="date" aria-describedby="h-data e-data">
+            <p class="field-hint" id="h-data">Terça a sábado.</p>
+            <p class="field-error" id="e-data"></p>
+          </div>
+          <div class="field">
+            <label for="f-hora">Horário desejado</label>
+            <div class="select-wrap"><select id="f-hora" name="horario" aria-describedby="h-hora e-hora"></select></div>
+            <p class="field-hint" id="h-hora">Sujeito à confirmação da barbearia.</p>
+            <p class="field-error" id="e-hora"></p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-obs">Observações (opcional)</label>
+          <textarea id="f-obs" name="observacoes" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn" type="submit">Revisar solicitação</button>
+          <button class="link-btn" type="button" data-close-booking>Cancelar</button>
+        </div>
+      </form>
+
+      <div class="booking-review" hidden>
+        <h3 class="review-title" tabindex="-1">Revise sua solicitação</h3>
+        <dl class="review-list" data-review-list></dl>
+        <p class="review-note" data-review-note></p>
+        <div class="form-actions">
+          <button class="btn" type="button" data-send-site hidden>Enviar solicitação pelo site</button>
+          <a class="btn" href="#contato" data-review-wa target="_blank" rel="noopener">Continuar pelo WhatsApp</a>
+          <button class="link-btn" type="button" data-edit>Editar dados</button>
+        </div>
+        <p class="booking-result" role="status" data-result></p>
+      </div>
+    </div>
+
+    <aside class="booking-aside" aria-label="Resumo da solicitação">
+      <span class="label">Resumo</span>
+      <p class="aside-name" data-aside-name>—</p>
+      <dl class="aside-list">
+        <div><dt>Preço</dt><dd data-aside-preco>—</dd></div>
+        <div><dt>Duração</dt><dd data-aside-duracao>—</dd></div>
+        <div><dt>Data</dt><dd data-aside-data>—</dd></div>
+        <div><dt>Horário</dt><dd data-aside-hora>—</dd></div>
+      </dl>
+      <p class="aside-note">O horário só fica marcado depois da confirmação da barbearia.</p>
+    </aside>
+  </div>
+</section>
+
+<!-- 03 — COMO FUNCIONA -->
+<section class="feature on-dark" id="como-funciona">
+  <div class="feature-media reveal-clip">
+    <img src="cut2.jpg" alt="Barbeiro finalizando um degradê com pente e navalha" width="1400" height="2097" loading="lazy" decoding="async">
+  </div>
+  <div class="feature-body">
+    <div class="sec-rule rv-line"></div>
+    <div class="sec-meta rv"><span class="sec-index">03</span><span class="label">Agendamento</span></div>
+    <h2 class="feature-title foc" style="--delay:90ms">Como funciona</h2>
+    <ol class="steps in" style="--stagger:90ms;--delay:180ms">
+      <li class="step"><span class="step-num" aria-hidden="true">1</span><h3 class="step-title">Escolha o serviço</h3><p class="step-text">Selecione uma opção na lista de serviços e preços.</p></li>
+      <li class="step"><span class="step-num" aria-hidden="true">2</span><h3 class="step-title">Envie a solicitação</h3><p class="step-text">Informe nome, WhatsApp, dia e horário desejados.</p></li>
+      <li class="step"><span class="step-num" aria-hidden="true">3</span><h3 class="step-title">Confirme a disponibilidade com a barbearia</h3><p class="step-text">O horário só fica marcado depois da resposta pelo WhatsApp.</p></li>
+    </ol>
+    <div class="rv" style="--delay:450ms"><a class="btn" href="#servicos">Solicitar horário</a></div>
+  </div>
+</section>
+
+<!-- 04 — A BARBEARIA (texto de apresentação + ensaio) -->
+<section class="section essay" id="barbearia">
+  <div class="container">
+    <div class="sec-head">
+      <div class="sec-rule rv-line"></div>
+      <div class="sec-meta rv"><span class="sec-index">04</span><span class="label">A barbearia</span></div>
+      <div class="essay-head">
+        <h2 class="title foc">Conheça o espaço</h2>
+        <!-- texto montado só com dados já presentes no site (pendentes de validação) -->
+        <p class="essay-text rv" style="--delay:90ms">A NAVALHA é uma barbearia em Lourdes, Belo Horizonte, que trabalha com hora marcada. Oferece corte, barba, acabamento e sobrancelha, com dois barbeiros na equipe. O agendamento é feito pelo WhatsApp, de terça a sábado, das 9h às 20h.</p>
+      </div>
+    </div>
+    <div class="essay-grid in" style="--stagger:80ms;--dur:.7s">
+      <figure class="g-item g-main"><img src="shop.jpg" alt="Salão com parede de tijolos, espelhos e três cadeiras de barbeiro" width="1400" height="930" loading="lazy" decoding="async"><figcaption>Lourdes, BH</figcaption></figure>
+      <figure class="g-item g-chair"><img src="beard.jpg" alt="Cadeira de barbeiro em couro marrom" width="1400" height="933" loading="lazy" decoding="async"><figcaption>Sua cadeira</figcaption></figure>
+      <figure class="g-item g-tools"><img src="razor.jpg" alt="Tesoura, pente e secador sobre uma maleta de madeira" width="1400" height="933" loading="lazy" decoding="async"><figcaption>Ferramentas</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- 05 — BARBEIROS -->
+<section class="section team" id="barbeiros">
+  <div class="container team-inner">
+    <div class="sec-head">
+      <div class="sec-rule rv-line"></div>
+      <div class="sec-meta rv"><span class="sec-index">05</span><span class="label">Equipe</span></div>
+      <h2 class="title foc">Barbeiros</h2>
+    </div>
+    <!-- nomes, especialidades e fotos: dados demonstrativos, pendentes de validação -->
+    <ul class="team-grid">
+      <li class="barber barber-rafael" style="--i:0">
+        <div class="barber-photo"><img src="portrait3.jpg" alt="Retrato de Rafael Nunes" width="1400" height="2100" loading="lazy" decoding="async"></div>
+        <div class="barber-body"><h3 class="barber-name">Rafael Nunes</h3><span class="barber-role">Cortes clássicos e navalhados</span></div>
+      </li>
+      <li class="barber barber-diego" style="--i:1">
+        <div class="barber-photo"><img src="portrait.jpg" alt="Retrato de Diego Alves" width="1400" height="2488" loading="lazy" decoding="async"></div>
+        <div class="barber-body"><h3 class="barber-name">Diego Alves</h3><span class="barber-role">Degradê e visagismo</span></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 06 — AGENDAMENTO (contracapa) -->
+<section class="section contact on-dark" id="contato">
+  <div class="container">
+    <div class="sec-rule rv-line"></div>
+    <div class="sec-meta rv"><span class="sec-index">06</span><span class="label">Contato</span></div>
+    <h2 class="close-title foc"><span class="line">Vamos agendar</span> <span class="line">seu horário?</span></h2>
+    <!-- endereço, horário e telefone: pendentes de validação -->
+    <dl class="close-row in" style="--shift:12px;--delay:200ms">
+      <div class="close-cta">
+        <div class="form-actions"><a class="btn" href="#servicos">Solicitar horário</a><a class="btn btn-outline" href="#contato" data-wa>Falar no WhatsApp</a></div>
+        <p class="contact-note">O horário só fica reservado depois que a barbearia confirmar pelo WhatsApp.</p>
+      </div>
+      <div><dt>Endereço</dt><dd>Rua Pium-í, 540<br>Lourdes, Belo Horizonte – MG</dd></div>
+      <div><dt>Horário</dt><dd>Terça a sábado<br>9h às 20h</dd></div>
+      <div><dt>WhatsApp</dt><dd class="phone"><span data-phone></span><noscript>(31) 99000-0000</noscript></dd></div>
+    </dl>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span class="footer-brand">NAVALHA</span>
+    <span>Projeto demonstrativo · CAIOCAMPOS.DEV · © 2026</span>
+  </div>
+</footer>
+
+<script>
+  // Configuração única. PENDENTE DE VALIDAÇÃO: número, horários e funcionamento são demonstrativos.
+  // (o <noscript> do contato repete o telefone só para quem navega sem JavaScript)
+  var NAVALHA_CONFIG = {
+    whatsapp: '5531990000000',
+    telefone: '(31) 99000-0000',
+    mensagemPadrao: 'Olá! Gostaria de agendar um horário na NAVALHA.',
+    // dias de atendimento (0 = domingo … 6 = sábado) e janela de horários oferecidos no formulário
+    funcionamento: { dias: [2, 3, 4, 5, 6], abre: '09:00', fecha: '20:00', intervaloMin: 30 },
+    // Envio pelo site via Netlify Forms (form name="agendamento"). Só funciona no site publicado no Netlify,
+    // com "Form detection" ativado no painel. Em localhost/arquivo local o botão não aparece e o site oferece
+    // o WhatsApp. null = envio pelo site desligado. Em nenhum caso o site finge um envio que não aconteceu.
+    envioOnline: { provedor: 'netlify', formulario: 'agendamento' }
+  };
+
+  (function(){
+    var cfg = NAVALHA_CONFIG;
+    var root = document.documentElement;
+    var motion = root.classList.contains('motion');
+    var $ = function(s, r){ return (r || document).querySelector(s); };
+    var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+    var waLink = function(msg){ return 'https://wa.me/' + cfg.whatsapp + '?text=' + encodeURIComponent(msg); };
+
+    /* --- links do WhatsApp e telefone --- */
+    $$('[data-wa]').forEach(function(a){
+      a.href = waLink(a.getAttribute('data-wa') || cfg.mensagemPadrao);
+      a.target = '_blank';
+      a.rel = 'noopener';
+    });
+    $$('[data-phone]').forEach(function(el){ el.textContent = cfg.telefone; });
+
+    /* --- imagem que não carrega: fundo intencional + diagnóstico, nunca uma coluna vazia sem explicação --- */
+    $$('img').forEach(function(img){
+      function fail(){
+        var box = img.closest('.feature-media, .g-item, .barber-photo, .hero-photo');
+        if (box) { box.classList.add('img-failed'); box.setAttribute('data-img-error', img.getAttribute('src')); }
+        console.warn('[NAVALHA] imagem não carregou: ' + img.getAttribute('src'));
+      }
+      if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) fail();
+      else img.addEventListener('error', fail);
+    });
+
+    /* --- cabeçalho: claro depois de 40px (sentinela de 40px, sem listener de scroll) --- */
+    var header = $('.site-header');
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function(es){
+        header.classList.toggle('is-scrolled', !es[0].isIntersecting);
+      }).observe($('.top-sentinel'));
+    } else {
+      header.classList.add('is-scrolled');
+    }
+
+    /* --- menu do celular --- */
+    var toggle = $('.menu-toggle', header);
+    var menu = document.getElementById('menu');
+    function setMenu(open){
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+      header.classList.toggle('menu-open', open);
+    }
+    toggle.addEventListener('click', function(){ setMenu(toggle.getAttribute('aria-expanded') !== 'true'); });
+    menu.addEventListener('click', function(e){ if (e.target.closest('a')) setMenu(false); });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && header.classList.contains('menu-open')) { setMenu(false); toggle.focus(); }
+    });
+    var desktop = matchMedia('(min-width:760px)');
+    var onChange = function(e){ if (e.matches) setMenu(false); };
+    if (desktop.addEventListener) desktop.addEventListener('change', onChange); else desktop.addListener(onChange);
+
+    /* --- índices dos grupos .in (stagger) --- */
+    $$('.in').forEach(function(g){
+      Array.prototype.forEach.call(g.children, function(c, i){ c.style.setProperty('--i', i); });
+    });
+
+    /* --- entrada do hero: atraso por linha real do título (250 / 370 / 490ms).
+           As duas cópias do título recebem os mesmos atrasos, palavra a palavra. --- */
+    var hero = $('.hero');
+    function startHero(){
+      var dark = $$('.hero-title .t-dark .w'), light = $$('.hero-title .t-light .w'), tops = [];
+      dark.forEach(function(w, i){
+        var t = w.offsetTop;
+        if (tops.indexOf(t) < 0) tops.push(t);
+        var d = (250 + 120 * tops.indexOf(t)) + 'ms';
+        w.style.setProperty('--d', d);
+        if (light[i]) light[i].style.setProperty('--d', d);
+      });
+      hero.classList.add('is-entering');
+      requestAnimationFrame(function(){ hero.classList.add('is-in'); });
+      setTimeout(function(){ hero.classList.remove('is-entering'); }, 1700);
+    }
+    if (motion) {
+      var fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
+      Promise.race([fontsReady, new Promise(function(r){ setTimeout(r, 500); })]).then(startHero);
+    } else {
+      hero.classList.add('is-in');
+    }
+
+    /* --- revelações por rolagem: uma vez por elemento, a partir de 15% visível.
+           .reveal-clip começa recortado a 0px de largura, o que o observador enxerga como "nunca visível";
+           por isso o gatilho dele é o elemento pai, que não tem recorte. --- */
+    var targets = $$('.rv, .foc, .in, .rv-line, .reveal-clip, .team-grid');
+    if (motion && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(es){
+        es.forEach(function(e){
+          if (e.isIntersecting || e.boundingClientRect.bottom < 0) {
+            (e.target.__reveal || [e.target]).forEach(function(t){ t.classList.add('is-visible'); });
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      targets.forEach(function(t){
+        var watch = t.classList.contains('reveal-clip') ? t.parentElement : t;
+        (watch.__reveal = watch.__reveal || []).push(t);
+        if (watch.__reveal.length === 1) io.observe(watch);
+      });
+    } else {
+      targets.forEach(function(t){ t.classList.add('is-visible'); });
+    }
+
+    /* ================================================================
+       SELEÇÃO DE SERVIÇO + SOLICITAÇÃO DE HORÁRIO
+       ================================================================ */
+    var radios = $$('input[name="servico"]');
+    var list = $('.svc-list');
+    var openBtn = $('[data-open-booking]');
+    var booking = $('#agendar');
+    var form = $('.booking-form', booking);
+    var review = $('.booking-review', booking);
+    var f = {
+      servico: $('#f-servico'), nome: $('#f-nome'), whats: $('#f-whats'),
+      data: $('#f-data'), hora: $('#f-hora'), obs: $('#f-obs')
+    };
+    var reduce = !motion;
+
+    function servico(value){
+      var r = radios.filter(function(x){ return x.value === value; })[0];
+      return r ? { value: r.value, nome: r.dataset.nome, preco: r.dataset.preco,
+                   duracao: +r.dataset.duracao, duracaoLabel: r.dataset.duracaoLabel } : null;
+    }
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    function toMin(hhmm){ var p = hhmm.split(':'); return +p[0] * 60 + +p[1]; }
+    function toHHMM(min){ return pad(Math.floor(min / 60)) + ':' + pad(min % 60); }
+    function todayISO(){ var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+    function parseISO(iso){ var p = iso.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+    function dataLonga(iso){
+      return parseISO(iso).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    // opções do <select> de serviço vêm da lista (fonte única)
+    f.servico.innerHTML = '<option value="">Selecione</option>' + radios.map(function(r){
+      return '<option value="' + r.value + '">' + r.dataset.nome + ' — ' + r.dataset.preco + ' · ' + r.dataset.duracaoLabel + '</option>';
+    }).join('');
+
+    // horários: de "abre" até o último início que termina antes de "fecha" (sem afirmar disponibilidade)
+    function preencherHorarios(){
+      var s = servico(f.servico.value), atual = f.hora.value;
+      var fim = toMin(cfg.funcionamento.fecha) - (s ? s.duracao : 0), opts = ['<option value="">Selecione</option>'];
+      for (var m = toMin(cfg.funcionamento.abre); m <= fim; m += cfg.funcionamento.intervaloMin) {
+        var h = toHHMM(m); opts.push('<option value="' + h + '"' + (h === atual ? ' selected' : '') + '>' + h + '</option>');
+      }
+      f.hora.innerHTML = opts.join('');
+    }
+    f.data.min = todayISO();
+
+    function atualizarResumo(){
+      var s = servico(f.servico.value);
+      $('[data-aside-name]').textContent = s ? s.nome : '—';
+      $('[data-aside-preco]').textContent = s ? s.preco : '—';
+      $('[data-aside-duracao]').textContent = s ? s.duracaoLabel : '—';
+      $('[data-aside-data]').textContent = f.data.value ? parseISO(f.data.value).toLocaleDateString('pt-BR') : '—';
+      $('[data-aside-hora]').textContent = f.hora.value || '—';
+    }
+
+    function selecionar(value){
+      radios.forEach(function(r){
+        var on = r.value === value;
+        r.checked = on;
+        r.closest('.svc').classList.toggle('is-selected', on);
+      });
+      list.classList.toggle('has-selection', !!value);
+      var s = servico(value);
+      $('[data-sum-name]').textContent = s ? s.nome : 'Nenhum serviço';
+      $('[data-sum-meta]').textContent = s ? s.preco + ' · ' + s.duracaoLabel : 'Selecione uma opção na lista.';
+      openBtn.disabled = !s;
+      if (f.servico.value !== (value || '')) f.servico.value = value || '';
+      preencherHorarios();
+      atualizarResumo();
+    }
+    radios.forEach(function(r){ r.addEventListener('change', function(){ selecionar(r.value); }); });
+    f.servico.addEventListener('change', function(){ selecionar(f.servico.value); limparErro('servico'); });
+    [f.data, f.hora].forEach(function(el){ el.addEventListener('change', atualizarResumo); });
+
+    function mostrarForm(){
+      review.hidden = true;
+      form.hidden = false;
+    }
+    function abrirAgendamento(){
+      booking.hidden = false;
+      mostrarForm();
+      booking.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      $('#booking-title').focus({ preventScroll: true });
+    }
+    openBtn.addEventListener('click', abrirAgendamento);
+    $('[data-close-booking]').addEventListener('click', function(){
+      booking.hidden = true;
+      openBtn.focus();
+    });
+
+    /* --- validação --- */
+    var erros = { servico: $('#e-servico'), nome: $('#e-nome'), whats: $('#e-whats'), data: $('#e-data'), hora: $('#e-hora') };
+    function marcarErro(chave, msg){
+      var campo = f[chave], el = erros[chave];
+      el.textContent = msg;
+      campo.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      campo.closest('.field').classList.toggle('has-error', !!msg);
+    }
+    function limparErro(chave){ marcarErro(chave, ''); }
+    ['nome', 'whats', 'data', 'hora'].forEach(function(k){
+      f[k].addEventListener('input', function(){ limparErro(k); });
+      f[k].addEventListener('change', function(){ limparErro(k); });
+    });
+
+    function validar(){
+      var problemas = {};
+      if (!servico(f.servico.value)) problemas.servico = 'Escolha um serviço.';
+      if (f.nome.value.trim().length < 2) problemas.nome = 'Informe seu nome.';
+      var digitos = f.whats.value.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '');
+      if (!digitos) problemas.whats = 'Informe um WhatsApp para contato.';
+      else if (digitos.length < 10 || digitos.length > 11) problemas.whats = 'Informe o número com DDD, por exemplo (31) 99999-9999.';
+      if (!f.data.value) problemas.data = 'Escolha uma data.';
+      else if (f.data.value < todayISO()) problemas.data = 'A data não pode ser anterior a hoje.';
+      else if (cfg.funcionamento.dias.indexOf(parseISO(f.data.value).getDay()) < 0) problemas.data = 'A barbearia atende de terça a sábado.';
+      if (!f.hora.value) problemas.hora = 'Escolha um horário.';
+      else if (f.data.value === todayISO()) {
+        var agora = new Date();
+        if (toMin(f.hora.value) <= agora.getHours() * 60 + agora.getMinutes()) problemas.hora = 'Esse horário já passou. Escolha um horário posterior.';
+      }
+      Object.keys(erros).forEach(function(k){ marcarErro(k, problemas[k] || ''); });
+      var primeiro = Object.keys(erros).filter(function(k){ return problemas[k]; })[0];
+      if (primeiro) f[primeiro].focus();
+      return !primeiro;
+    }
+
+    /* --- revisão e envio --- */
+    var pedido = null;
+    function montarPedido(){
+      var s = servico(f.servico.value);
+      return {
+        servico: s.nome, preco: s.preco, duracao: s.duracaoLabel,
+        data: f.data.value, dataLonga: dataLonga(f.data.value), horario: f.hora.value,
+        nome: f.nome.value.trim(), whatsapp: f.whats.value.trim(), observacoes: f.obs.value.trim()
+      };
+    }
+    function mensagem(p){
+      return [
+        'Olá! Gostaria de solicitar um horário na NAVALHA.',
+        '',
+        'Serviço: ' + p.servico + ' (' + p.preco + ' · ' + p.duracao + ')',
+        'Data: ' + p.dataLonga,
+        'Horário: ' + p.horario,
+        'Nome: ' + p.nome,
+        'WhatsApp: ' + p.whatsapp,
+        p.observacoes ? 'Observações: ' + p.observacoes : null,
+        '',
+        'Aguardo a confirmação da disponibilidade.'
+      ].filter(function(l){ return l !== null; }).join('\n');
+    }
+    function esc(t){ var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      if (!validar()) return;
+      pedido = montarPedido();
+      var linhas = [['Serviço', pedido.servico], ['Preço', pedido.preco], ['Duração', pedido.duracao],
+        ['Data', pedido.dataLonga], ['Horário', pedido.horario], ['Nome', pedido.nome], ['WhatsApp', pedido.whatsapp]];
+      if (pedido.observacoes) linhas.push(['Observações', pedido.observacoes]);
+      $('[data-review-list]').innerHTML = linhas.map(function(l){
+        return '<div><dt>' + l[0] + '</dt><dd>' + esc(l[1]) + '</dd></div>';
+      }).join('');
+      var online = envioDisponivel();
+      var send = $('[data-send-site]');
+      send.hidden = !online;
+      send.disabled = false;
+      send.textContent = 'Enviar solicitação pelo site';
+      var wa = $('[data-review-wa]');
+      wa.href = waLink(mensagem(pedido));
+      wa.classList.toggle('btn-outline', online);
+      $('[data-review-note]').textContent = online
+        ? 'Esta é uma solicitação, não uma reserva confirmada. A barbearia responde pelo WhatsApp informado.'
+        : cfg.envioOnline
+          ? 'O envio pelo site só funciona no endereço publicado. Aqui, continue pelo WhatsApp: a mensagem já vai preenchida com os dados acima.'
+          : 'O envio pelo site não está ativado. Continue pelo WhatsApp: a mensagem já vai preenchida com os dados acima.';
+      $('[data-result]').textContent = '';
+      form.hidden = true;
+      review.hidden = false;
+      $('.review-title', review).focus();
+    });
+    $('[data-edit]').addEventListener('click', function(){ mostrarForm(); f.servico.focus(); });
+
+    // Netlify Forms só existe no site publicado: fora dele (arquivo local, localhost) não há quem receba o POST
+    function envioDisponivel(){
+      if (!cfg.envioOnline || !/^https?:$/.test(location.protocol)) return false;
+      return !/^(localhost|127\.0\.0\.1|\[::1\]|.*\.local)$/.test(location.hostname);
+    }
+
+    // Netlify Forms recebe POST em "/" no formato de formulário, com form-name e os mesmos names do <form>.
+    // Resultado sempre honesto: só diz "enviada" se o Netlify responder com sucesso.
+    $('[data-send-site]').addEventListener('click', function(){
+      var btn = this, out = $('[data-result]');
+      if (!envioDisponivel() || !pedido) return;
+      btn.disabled = true;
+      out.textContent = 'Enviando…';
+      var corpo = new URLSearchParams({
+        'form-name': cfg.envioOnline.formulario,
+        'bot-field': form.querySelector('[name="bot-field"]').value,
+        servico: pedido.servico, preco: pedido.preco, duracao: pedido.duracao,
+        data: pedido.dataLonga, horario: pedido.horario,
+        nome: pedido.nome, whatsapp: pedido.whatsapp, observacoes: pedido.observacoes
+      });
+      fetch('/', {
+        method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: corpo.toString()
+      }).then(function(res){
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        btn.textContent = 'Solicitação enviada';
+        out.textContent = 'Solicitação enviada. O horário ainda não está confirmado: a barbearia vai responder pelo WhatsApp informado.';
+      }).catch(function(){
+        btn.disabled = false;
+        out.textContent = 'Não foi possível enviar pelo site agora. Use "Continuar pelo WhatsApp" para enviar a mesma solicitação.';
+      });
+    });
+
+    selecionar('');
+    window.__navalhaReady = true;
+  })();
+</script>
+</body>
 </html>
