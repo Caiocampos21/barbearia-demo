@@ -1,4 +1,3 @@
 [build]
-  command = "echo no build"
-  publish = "."
-  # site estatico - forca rebuild limpo
+command = "echo no build"
+publish = "public"
